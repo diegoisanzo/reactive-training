@@ -8,7 +8,7 @@ import java.util.List;
 public class BookFixture {
 
     public static Book withDefaults() {
-        return copy(BookSeedData.ALL.get(0));
+        return copy(BookSeedData.ALL.getFirst());
     }
 
     public static List<Book> all() {
