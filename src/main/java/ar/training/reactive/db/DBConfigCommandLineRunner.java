@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
 
-import java.util.UUID;
-
 @Configuration
 public class DBConfigCommandLineRunner {
 
@@ -32,9 +30,7 @@ public class DBConfigCommandLineRunner {
     }
 
     private void insertBooks() {
-        upsertBook(new Book(UUID.fromString("93d68169-2722-427f-8556-0762db939eb7"), "9780132350884", "Clean Code"));
-        upsertBook(new Book(UUID.fromString("93d68169-2722-427f-8556-0762db939eb8"), "9780132350885", "Design Patterns"));
-        upsertBook(new Book(UUID.fromString("93d68169-2722-427f-8556-0762db939eb9"), "9780132350886", "Database Management Systems"));
+        BookSeedData.ALL.forEach(this::upsertBook);
     }
 
     private void upsertBook(Book book) {
