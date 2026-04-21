@@ -1,5 +1,8 @@
 package ar.training.reactive.db;
 
+import ar.training.reactive.entity.Book;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -11,10 +14,12 @@ import java.util.UUID;
 @Configuration
 public class DBConfigCommandLineRunner {
 
+    private final Logger log;
     private final DatabaseClient client;
 
     @Autowired
     public DBConfigCommandLineRunner(DatabaseClient client) {
+        this.log = LoggerFactory.getLogger(getClass());
         this.client = client;
     }
 
@@ -27,21 +32,12 @@ public class DBConfigCommandLineRunner {
     }
 
     private void insertBooks() {
-        upsertBook(
-                UUID.fromString("93d68169-2722-427f-8556-0762db939eb7"),
-                "9780132350884",
-                "Clean Code");
-        upsertBook(
-                UUID.fromString("93d68169-2722-427f-8556-0762db939eb8"),
-                "9780132350885",
-                "Design Patterns");
-        upsertBook(
-                UUID.fromString("93d68169-2722-427f-8556-0762db939eb9"),
-                "9780132350886",
-                "Database Management Systems");
+        upsertBook(new Book(UUID.fromString("93d68169-2722-427f-8556-0762db939eb7"), "9780132350884", "Clean Code"));
+        upsertBook(new Book(UUID.fromString("93d68169-2722-427f-8556-0762db939eb8"), "9780132350885", "Design Patterns"));
+        upsertBook(new Book(UUID.fromString("93d68169-2722-427f-8556-0762db939eb9"), "9780132350886", "Database Management Systems"));
     }
 
-    private void upsertBook(UUID id, String isbn, String title) {
+    private void upsertBook(Book book) {
         client.sql("""
                         INSERT INTO book (id, isbn, title)
                         VALUES (:id, :isbn, :title)
@@ -49,12 +45,12 @@ public class DBConfigCommandLineRunner {
                         DO UPDATE SET
                             isbn = EXCLUDED.isbn,
                             title = EXCLUDED.title;""")
-                .bind("id", id)
-                .bind("isbn", isbn)
-                .bind("title", title)
+                .bind("id", book.getId())
+                .bind("isbn", book.getIsbn())
+                .bind("title", book.getTitle())
                 .then()
-                .doOnSuccess(v -> System.out.println("'" + title + "' inserted*"))
-                .doOnError(e -> System.err.println("Error inserting book: " + e.getMessage()))
+                .doOnSuccess(v -> log.info("'{}' inserted", book.getTitle()))
+                .doOnError(e -> log.error("Error inserting book: {}", e.getMessage()))
                 .subscribe();
     }
 
@@ -67,9 +63,9 @@ public class DBConfigCommandLineRunner {
             );
         """)
                 .then()
-                .doOnSuccess(v -> System.out.println("Tabla 'book' verificada/creada."))
-                .doOnError(e -> System.err.println("Error creando la tabla: " + e.getMessage()))
-                .subscribe(); // Importante: En flujos reactivos, si no te suscribes, no pasa nada.
+                .doOnSuccess(v -> log.info("Table 'book' verified/created."))
+                .doOnError(e -> log.error("Error creating table: {}", e.getMessage()))
+                .subscribe();
     }
 
 }
