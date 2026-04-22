@@ -1,0 +1,14 @@
+package ar.training.reactive.controller;
+
+import ar.training.reactive.exception.BookNotFoundException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class ExceptionHandler {
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<Void> handleBookNotFound(BookNotFoundException ex) {
+        return ResponseEntity.notFound().build();
+    }
+}

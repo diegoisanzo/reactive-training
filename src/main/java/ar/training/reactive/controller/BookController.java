@@ -32,22 +32,19 @@ public class BookController {
     @GetMapping("/{id}")
     public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable UUID id) {
         return bookService.getBookById(id)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok);
     }
 
     @PutMapping
     public Mono<ResponseEntity<BookDto>> updateBookBy(@RequestBody BookDto bookDto) {
         return bookService.updateBook(bookDto)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok);
     }
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deleteBookById(@PathVariable UUID id) {
-        logger.warn("TODO: solve for 404  NOT FOUND! what to do here ?");
         return bookService.deleteById(id)
-                .thenReturn(ResponseEntity.noContent().build());
+                .thenReturn(ResponseEntity.noContent().<Void>build());
     }
 
     @GetMapping
