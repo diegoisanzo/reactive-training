@@ -1,9 +1,7 @@
 package ar.training.reactive.fixture;
 
 import ar.training.reactive.dto.BookDto;
-import org.springframework.boot.data.r2dbc.test.autoconfigure.DataR2dbcTest;
 
-@DataR2dbcTest
 public class BookDtoFixture {
 
     public static BookDto withDefaults() {
