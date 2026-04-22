@@ -1,11 +1,13 @@
 package ar.training.reactive;
 
-import ar.training.reactive.controller.BookController;
-import ar.training.reactive.dto.BookDto;
+import ar.training.reactive.adapter.inbound.rest.BookController;
+import ar.training.reactive.domain.model.Book;
+import ar.training.reactive.adapter.inbound.rest.BookDto;
 import ar.training.reactive.fixture.BookDtoFixture;
 import ar.training.reactive.fixture.BookFixture;
-import ar.training.reactive.repository.BookRepository;
-import ar.training.reactive.service.BookService;
+import ar.training.reactive.adapter.outbound.persistence.BookRepositoryAdapter;
+import ar.training.reactive.adapter.outbound.persistence.R2dbcBookRepository;
+import ar.training.reactive.domain.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,7 @@ class ReactiveTrainingApplicationTests {
 
     private final WebTestClient webTestClient;
     private final BookService bookService;
-    private final BookRepository bookRepository;
+    private final R2dbcBookRepository bookRepository;
     private final ApplicationContext applicationContext;
     private final R2dbcEntityTemplate template;
 
@@ -44,7 +46,7 @@ class ReactiveTrainingApplicationTests {
     ReactiveTrainingApplicationTests(
             WebTestClient webTestClient,
             BookService bookService,
-            BookRepository bookRepository,
+            R2dbcBookRepository bookRepository,
             ApplicationContext applicationContext,
             R2dbcEntityTemplate template) {
         this.webTestClient = webTestClient;
@@ -65,7 +67,7 @@ class ReactiveTrainingApplicationTests {
     void contextLoads() {
         assertContainsBeanOfType(BookController.class);
         assertContainsBeanOfType(BookService.class);
-        assertContainsBeanOfType(BookRepository.class);
+        assertContainsBeanOfType(BookRepositoryAdapter.class);
     }
 
     private void assertContainsBeanOfType(final Class<?> requiredType) {
@@ -77,9 +79,14 @@ class ReactiveTrainingApplicationTests {
 
     @Test
     void shouldUpdateBook() {
+        var updated = BookDtoFixture.withUpdatesToDefault();
+        var book = new Book(updated.id(), updated.ISBN(), updated.title());
         StepVerifier
-                .create(bookService.updateBook(BookDtoFixture.withUpdatesToDefault()))
-                .expectNext(BookDtoFixture.withUpdatesToDefault())
+                .create(bookService.updateBook(book))
+                .expectNextMatches(b ->
+                        b.getId().equals(updated.id()) &&
+                        b.getIsbn().equals(updated.ISBN()) &&
+                        b.getTitle().equals(updated.title()))
                 .verifyComplete();
     }
 

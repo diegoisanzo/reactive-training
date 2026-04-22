@@ -1,6 +1,6 @@
-package ar.training.reactive.controller;
+package ar.training.reactive.adapter.inbound.rest;
 
-import ar.training.reactive.exception.BookNotFoundException;
+import ar.training.reactive.domain.exception.BookNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 

@@ -1,12 +1,11 @@
 package ar.training.reactive.fixture;
 
-import ar.training.reactive.dto.BookDto;
+import ar.training.reactive.adapter.inbound.rest.BookDto;
 
 public class BookDtoFixture {
 
     public static BookDto withDefaults() {
         var defaultBook = BookFixture.withDefaults();
-
         return BookDto.of(defaultBook);
     }
 
@@ -16,5 +15,4 @@ public class BookDtoFixture {
                 "9780132350888",
                 "Clean Code: Updated");
     }
-
 }

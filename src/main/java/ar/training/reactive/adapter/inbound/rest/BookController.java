@@ -1,7 +1,7 @@
-package ar.training.reactive.controller;
+package ar.training.reactive.adapter.inbound.rest;
 
-import ar.training.reactive.dto.BookDto;
-import ar.training.reactive.service.BookService;
+import ar.training.reactive.domain.model.Book;
+import ar.training.reactive.domain.service.BookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +33,16 @@ public class BookController {
     public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable UUID id) {
         logger.info("BookController::getBookById({})", id);
         return bookService.getBookById(id)
+                .map(BookDto::of)
                 .map(ResponseEntity::ok);
     }
 
     @PutMapping
     public Mono<ResponseEntity<BookDto>> updateBookBy(@RequestBody BookDto bookDto) {
         logger.info("BookController::updateBookBy({})", bookDto);
-        return bookService.updateBook(bookDto)
+        var book = new Book(bookDto.id(), bookDto.ISBN(), bookDto.title());
+        return bookService.updateBook(book)
+                .map(BookDto::of)
                 .map(ResponseEntity::ok);
     }
 
@@ -54,6 +57,7 @@ public class BookController {
     public Mono<ResponseEntity<List<BookDto>>> getAllBooks() {
         logger.info("BookController::getAllBooks()");
         return bookService.getAllBooks()
+                .map(BookDto::of)
                 .collectList()
                 .map(ResponseEntity::ok);
     }

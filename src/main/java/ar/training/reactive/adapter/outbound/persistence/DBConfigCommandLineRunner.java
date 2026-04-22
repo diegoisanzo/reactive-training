@@ -1,6 +1,6 @@
-package ar.training.reactive.db;
+package ar.training.reactive.adapter.outbound.persistence;
 
-import ar.training.reactive.entity.Book;
+import ar.training.reactive.domain.model.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,5 +63,4 @@ public class DBConfigCommandLineRunner {
                 .doOnError(e -> log.error("Error creating table", e))
                 .subscribe();
     }
-
 }

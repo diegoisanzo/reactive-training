@@ -1,4 +1,4 @@
-package ar.training.reactive.exception;
+package ar.training.reactive.domain.exception;
 
 import java.util.UUID;
 

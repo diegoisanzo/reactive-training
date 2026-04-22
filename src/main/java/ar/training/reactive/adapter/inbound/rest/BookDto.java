@@ -1,6 +1,6 @@
-package ar.training.reactive.dto;
+package ar.training.reactive.adapter.inbound.rest;
 
-import ar.training.reactive.entity.Book;
+import ar.training.reactive.domain.model.Book;
 
 import java.util.UUID;
 
@@ -13,5 +13,4 @@ public record BookDto(UUID id, String ISBN, String title) {
             book.getTitle()
         );
     }
-
 }

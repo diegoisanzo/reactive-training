@@ -1,6 +1,6 @@
-package ar.training.reactive.db;
+package ar.training.reactive.adapter.outbound.persistence;
 
-import ar.training.reactive.entity.Book;
+import ar.training.reactive.domain.model.Book;
 
 import java.util.List;
 import java.util.UUID;
