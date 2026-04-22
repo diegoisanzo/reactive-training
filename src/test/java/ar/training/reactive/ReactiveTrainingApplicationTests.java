@@ -20,6 +20,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -66,6 +68,13 @@ class ReactiveTrainingApplicationTests {
         assertContainsBeanOfType(BookRepository.class);
     }
 
+    private void assertContainsBeanOfType(final Class<?> requiredType) {
+        var bean = applicationContext.getBean(requiredType);
+        assertThat(bean)
+                .isNotNull()
+                .isInstanceOf(requiredType);
+    }
+
     @Test
     void shouldUpdateBook() {
         StepVerifier
@@ -85,11 +94,62 @@ class ReactiveTrainingApplicationTests {
                 .contains(BookDtoFixture.withDefaults());
     }
 
-    private void assertContainsBeanOfType(Class<?> requiredType) {
-        var bean = applicationContext.getBean(requiredType);
-        assertThat(bean)
-                .isNotNull()
-                .isInstanceOf(requiredType);
+    @Test
+    void shouldReturnBookById() {
+        var expected = BookDtoFixture.withDefaults();
+        webTestClient.get()
+                .uri("/v1/books/{id}", expected.id())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BookDto.class)
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturn404WhenBookNotFoundById() {
+        webTestClient.get()
+                .uri("/v1/books/{id}", UUID.randomUUID())
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void shouldUpdateBookViaHttp() {
+        var updated = BookDtoFixture.withUpdatesToDefault();
+        webTestClient.put()
+                .uri("/v1/books")
+                .bodyValue(updated)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BookDto.class)
+                .isEqualTo(updated);
+    }
+
+    @Test
+    void shouldReturn404WhenUpdatingNonExistentBook() {
+        var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown");
+        webTestClient.put()
+                .uri("/v1/books")
+                .bodyValue(nonExistent)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void shouldDeleteBook() {
+        var id = BookDtoFixture.withDefaults().id();
+        webTestClient.delete()
+                .uri("/v1/books/{id}", id)
+                .exchange()
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    void shouldReturn404WhenDeletingNonExistentBook() {
+        webTestClient.delete()
+                .uri("/v1/books/{id}", UUID.randomUUID())
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
 }
