@@ -30,7 +30,7 @@ public class DBConfigCommandLineRunner {
     }
 
     private void insertBooks() {
-        BookSeedData.ALL.forEach(this::upsertBook);
+        BookDBData.ALL.forEach(this::upsertBook);
     }
 
     private void upsertBook(Book book) {
