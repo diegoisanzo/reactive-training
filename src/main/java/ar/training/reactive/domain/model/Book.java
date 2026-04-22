@@ -45,7 +45,7 @@ public final class Book {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, isbn, title);
+        return Objects.hash(id);
     }
 
     @Override
