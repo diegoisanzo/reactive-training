@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -51,8 +51,10 @@ public class BookController {
     }
 
     @GetMapping
-    public Flux<BookDto> getAllBooks() {
+    public Mono<ResponseEntity<List<BookDto>>> getAllBooks() {
         logger.info("BookController::getAllBooks()");
-        return bookService.getAllBooks();
+        return bookService.getAllBooks()
+                .collectList()
+                .map(ResponseEntity::ok);
     }
 }
