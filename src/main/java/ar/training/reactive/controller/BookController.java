@@ -31,24 +31,28 @@ public class BookController {
 
     @GetMapping("/{id}")
     public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable UUID id) {
+        logger.info("BookController::getBookById({})", id);
         return bookService.getBookById(id)
                 .map(ResponseEntity::ok);
     }
 
     @PutMapping
     public Mono<ResponseEntity<BookDto>> updateBookBy(@RequestBody BookDto bookDto) {
+        logger.info("BookController::updateBookBy({})", bookDto);
         return bookService.updateBook(bookDto)
                 .map(ResponseEntity::ok);
     }
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deleteBookById(@PathVariable UUID id) {
+        logger.info("BookController::deleteBookById({})", id);
         return bookService.deleteById(id)
                 .thenReturn(ResponseEntity.noContent().<Void>build());
     }
 
     @GetMapping
     public Flux<BookDto> getAllBooks() {
+        logger.info("BookController::getAllBooks()");
         return bookService.getAllBooks();
     }
 }
