@@ -19,21 +19,24 @@ public class BookRepositoryAdapter implements BookRepositoryPort {
 
     @Override
     public Mono<Book> findById(UUID id) {
-        return repository.findById(id);
+        return repository.findById(id)
+                .map(BookMapper::toDomain);
     }
 
     @Override
     public Flux<Book> findAll() {
-        return repository.findAll();
+        return repository.findAll()
+                .map(BookMapper::toDomain);
     }
 
     @Override
     public Mono<Book> save(Book book) {
-        return repository.save(book);
+        return repository.save(BookMapper.toEntity(book))
+                .map(BookMapper::toDomain);
     }
 
     @Override
     public Mono<Void> delete(Book book) {
-        return repository.delete(book);
+        return repository.delete(BookMapper.toEntity(book));
     }
 }

@@ -1,26 +1,12 @@
 package ar.training.reactive.domain.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
 import java.util.Objects;
 import java.util.UUID;
 
-// Intentionally keeps Spring Data annotations (@Table, @Column, @Id).
-// In strict hexagonal architecture, a separate persistence entity would
-// hold these annotations, with a mapping layer between them.
-// For this codebase, the trade-off is accepted to avoid that overhead.
-@Table("book")
 public final class Book {
-    @Id
-    @Column("id")
+
     private UUID id;
-
-    @Column("isbn")
     private String isbn;
-
-    @Column("title")
     private String title;
 
     public Book(UUID id, String isbn, String title) {
