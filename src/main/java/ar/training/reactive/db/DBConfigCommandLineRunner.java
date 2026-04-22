@@ -46,7 +46,7 @@ public class DBConfigCommandLineRunner {
                 .bind("title", book.getTitle())
                 .then()
                 .doOnSuccess(v -> log.info("'{}' inserted", book.getTitle()))
-                .doOnError(e -> log.error("Error inserting book: {}", e.getMessage()))
+                .doOnError(e -> log.error("Error inserting book", e))
                 .subscribe();
     }
 
@@ -60,7 +60,7 @@ public class DBConfigCommandLineRunner {
         """)
                 .then()
                 .doOnSuccess(v -> log.info("Table 'book' verified/created."))
-                .doOnError(e -> log.error("Error creating table: {}", e.getMessage()))
+                .doOnError(e -> log.error("Error creating table", e))
                 .subscribe();
     }
 
