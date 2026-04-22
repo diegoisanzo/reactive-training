@@ -29,7 +29,7 @@ public class BookService {
     public Flux<BookDto> getAllBooks() {
         return bookRepository
                 .findAll()
-                .map(BookDto::of) ;
+                .map(BookDto::of);
     }
 
     public Mono<BookDto> updateBook(BookDto bookDto) {
@@ -47,7 +47,8 @@ public class BookService {
     }
 
     public Mono<Void> deleteById(UUID id) {
-        return bookRepository.deleteById(id)
-                .switchIfEmpty(Mono.error(new BookNotFoundException(id)));
+        return bookRepository.findById(id)
+                .switchIfEmpty(Mono.error(new BookNotFoundException(id)))
+                .flatMap(bookRepository::delete);
     }
 }
