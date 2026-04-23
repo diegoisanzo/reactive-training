@@ -1,4 +1,4 @@
-package ar.training.reactive;
+package ar.training.reactive.application;
 
 import ar.training.reactive.adapter.inbound.rest.BookController;
 import ar.training.reactive.adapter.outbound.persistence.BookRepositoryAdapter;

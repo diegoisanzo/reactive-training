@@ -1,4 +1,4 @@
-package ar.training.reactive;
+package ar.training.reactive.application;
 
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.postgresql.PostgreSQLContainer;
