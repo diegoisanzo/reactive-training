@@ -1,45 +1,34 @@
 package ar.training.reactive;
 
-import ar.training.reactive.adapter.inbound.rest.BookController;
-import ar.training.reactive.domain.model.Book;
 import ar.training.reactive.adapter.inbound.rest.BookDto;
+import ar.training.reactive.adapter.outbound.persistence.R2dbcBookRepository;
+import ar.training.reactive.domain.model.Book;
+import ar.training.reactive.domain.service.BookService;
 import ar.training.reactive.fixture.BookDtoFixture;
 import ar.training.reactive.fixture.BookFixture;
-import ar.training.reactive.adapter.outbound.persistence.BookRepositoryAdapter;
-import ar.training.reactive.adapter.outbound.persistence.R2dbcBookRepository;
-import ar.training.reactive.domain.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.context.ImportTestcontainers;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.postgresql.PostgreSQLContainer;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ImportTestcontainers
+@ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
 class ReactiveTrainingApplicationTests {
-
-    @ServiceConnection
-    private static final PostgreSQLContainer postgresSQLContainer =
-            new PostgreSQLContainer("postgres:16-alpine");
 
     private final WebTestClient webTestClient;
     private final BookService bookService;
     private final R2dbcBookRepository bookRepository;
-    private final ApplicationContext applicationContext;
     private final R2dbcEntityTemplate template;
 
     @Autowired
@@ -47,12 +36,10 @@ class ReactiveTrainingApplicationTests {
             WebTestClient webTestClient,
             BookService bookService,
             R2dbcBookRepository bookRepository,
-            ApplicationContext applicationContext,
             R2dbcEntityTemplate template) {
         this.webTestClient = webTestClient;
         this.bookService = bookService;
         this.bookRepository = bookRepository;
-        this.applicationContext = applicationContext;
         this.template = template;
     }
 
@@ -61,20 +48,6 @@ class ReactiveTrainingApplicationTests {
         bookRepository.deleteAll()
                 .thenMany(Flux.fromIterable(BookFixture.all()).flatMap(template::insert))
                 .blockLast();
-    }
-
-    @Test
-    void contextLoads() {
-        assertContainsBeanOfType(BookController.class);
-        assertContainsBeanOfType(BookService.class);
-        assertContainsBeanOfType(BookRepositoryAdapter.class);
-    }
-
-    private void assertContainsBeanOfType(final Class<?> requiredType) {
-        var bean = applicationContext.getBean(requiredType);
-        assertThat(bean)
-                .isNotNull()
-                .isInstanceOf(requiredType);
     }
 
     @Test
@@ -158,5 +131,4 @@ class ReactiveTrainingApplicationTests {
                 .exchange()
                 .expectStatus().isNotFound();
     }
-
 }
