@@ -24,7 +24,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
-class ReactiveTrainingApplicationTests {
+class BookApplicationTests {
 
     private final WebTestClient webTestClient;
     private final BookService bookService;
@@ -32,7 +32,7 @@ class ReactiveTrainingApplicationTests {
     private final R2dbcEntityTemplate template;
 
     @Autowired
-    ReactiveTrainingApplicationTests(
+    BookApplicationTests(
             WebTestClient webTestClient,
             BookService bookService,
             R2dbcBookRepository bookRepository,
