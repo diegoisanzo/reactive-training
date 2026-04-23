@@ -40,7 +40,7 @@ public class BookController {
     @PutMapping
     public Mono<ResponseEntity<BookDto>> updateBookBy(@RequestBody BookDto bookDto) {
         logger.info("BookController::updateBookBy({})", bookDto);
-        var book = new Book(bookDto.id(), bookDto.ISBN(), bookDto.title());
+        var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title());
         return bookService.updateBook(book)
                 .map(BookDto::of)
                 .map(ResponseEntity::ok);

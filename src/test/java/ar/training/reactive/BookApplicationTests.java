@@ -53,12 +53,12 @@ class BookApplicationTests {
     @Test
     void shouldUpdateBook() {
         var updated = BookDtoFixture.withUpdatesToDefault();
-        var book = new Book(updated.id(), updated.ISBN(), updated.title());
+        var book = new Book(updated.id(), updated.isbn(), updated.title());
         StepVerifier
                 .create(bookService.updateBook(book))
                 .expectNextMatches(b ->
                         b.getId().equals(updated.id()) &&
-                        b.getIsbn().equals(updated.ISBN()) &&
+                        b.getIsbn().equals(updated.isbn()) &&
                         b.getTitle().equals(updated.title()))
                 .verifyComplete();
     }

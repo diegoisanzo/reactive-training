@@ -4,7 +4,7 @@ import ar.training.reactive.domain.model.Book;
 
 import java.util.UUID;
 
-public record BookDto(UUID id, String ISBN, String title) {
+public record BookDto(UUID id, String isbn, String title) {
 
     public static BookDto of(Book book) {
         return new BookDto(
