@@ -40,3 +40,8 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// covers current test task and any future test tasks (e.g. integrationTest)
+tasks.withType(Test).configureEach {
+	jvmArgs '-XX:+EnableDynamicAgentLoading'
+}
