@@ -13,13 +13,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ImportTestcontainers(SharedContainers.class)
@@ -86,11 +90,18 @@ class BookApplicationTests {
     }
 
     @Test
-    void shouldReturn404WhenBookNotFoundById() {
+    void shouldReturn404WhenBookNotFoundById() throws URISyntaxException {
+        var id = UUID.randomUUID();
+        var expectedProblemDetail = ProblemDetail.forStatusAndDetail(NOT_FOUND, "Book with id %s not found".formatted(id));
+        expectedProblemDetail.setTitle("Book not found");
+        expectedProblemDetail.setInstance(new URI("/v1/books/%s".formatted(id)));
+
         webTestClient.get()
-                .uri("/v1/books/{id}", UUID.randomUUID())
+                .uri("/v1/books/{id}", id)
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isNotFound()
+                .expectBody(ProblemDetail.class)
+                .isEqualTo(expectedProblemDetail);
     }
 
     @Test
