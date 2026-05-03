@@ -1,7 +1,7 @@
 package ar.training.reactive.adapter.outbound.persistence;
 
 import ar.training.reactive.domain.model.Book;
-import ar.training.reactive.domain.port.BookRepositoryPort;
+import ar.training.reactive.domain.port.out.BookRepositoryOutputPort;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -9,11 +9,11 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @Component
-public class BookRepositoryAdapter implements BookRepositoryPort {
+public class BookRepositoryOutputAdapter implements BookRepositoryOutputPort {
 
     private final R2dbcBookRepository repository;
 
-    public BookRepositoryAdapter(R2dbcBookRepository repository) {
+    public BookRepositoryOutputAdapter(R2dbcBookRepository repository) {
         this.repository = repository;
     }
 

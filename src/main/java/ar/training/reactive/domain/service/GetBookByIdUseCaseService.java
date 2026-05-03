@@ -2,7 +2,7 @@ package ar.training.reactive.domain.service;
 
 import ar.training.reactive.domain.exception.BookNotFoundException;
 import ar.training.reactive.domain.model.Book;
-import ar.training.reactive.domain.port.BookRepositoryPort;
+import ar.training.reactive.domain.port.out.BookRepositoryOutputPort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -10,8 +10,8 @@ import java.util.UUID;
 
 @Service
 public class GetBookByIdUseCaseService {
-    private final BookRepositoryPort bookRepository;
-    public GetBookByIdUseCaseService(BookRepositoryPort bookRepository) {
+    private final BookRepositoryOutputPort bookRepository;
+    public GetBookByIdUseCaseService(BookRepositoryOutputPort bookRepository) {
         this.bookRepository = bookRepository;
     }
 

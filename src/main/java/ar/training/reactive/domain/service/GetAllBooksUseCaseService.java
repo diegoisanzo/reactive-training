@@ -1,15 +1,15 @@
 package ar.training.reactive.domain.service;
 
 import ar.training.reactive.domain.model.Book;
-import ar.training.reactive.domain.port.BookRepositoryPort;
+import ar.training.reactive.domain.port.out.BookRepositoryOutputPort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
 public class GetAllBooksUseCaseService {
-    private final BookRepositoryPort bookRepository;
+    private final BookRepositoryOutputPort bookRepository;
 
-    public GetAllBooksUseCaseService(BookRepositoryPort bookRepository) {
+    public GetAllBooksUseCaseService(BookRepositoryOutputPort bookRepository) {
         this.bookRepository = bookRepository;
     }
 
