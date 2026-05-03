@@ -2,7 +2,7 @@ package ar.training.reactive.application;
 
 import ar.training.reactive.adapter.inbound.rest.BookController;
 import ar.training.reactive.adapter.outbound.persistence.BookRepositoryAdapter;
-import ar.training.reactive.domain.service.BookService;
+import ar.training.reactive.domain.service.UpdateBookUseCaseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +26,7 @@ class ApplicationContextTest {
     @Test
     void contextLoads() {
         assertContainsBeanOfType(BookController.class);
-        assertContainsBeanOfType(BookService.class);
+        assertContainsBeanOfType(UpdateBookUseCaseService.class);
         assertContainsBeanOfType(BookRepositoryAdapter.class);
     }
 

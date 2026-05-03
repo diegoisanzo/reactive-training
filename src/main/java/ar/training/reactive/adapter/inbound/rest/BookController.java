@@ -1,7 +1,10 @@
 package ar.training.reactive.adapter.inbound.rest;
 
 import ar.training.reactive.domain.model.Book;
-import ar.training.reactive.domain.service.BookService;
+import ar.training.reactive.domain.service.DeleteBookByIdUseCaseService;
+import ar.training.reactive.domain.service.UpdateBookUseCaseService;
+import ar.training.reactive.domain.service.GetAllBooksUseCaseService;
+import ar.training.reactive.domain.service.GetBookByIdUseCaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -21,18 +24,27 @@ import java.util.UUID;
 @RequestMapping("/v1/books")
 public class BookController {
 
-    private final BookService bookService;
+    private final GetAllBooksUseCaseService getAllBooksUseCaseService;
+    private final GetBookByIdUseCaseService getBookByIdUseCaseService;
+    private final UpdateBookUseCaseService updateBookUseCaseService;
+    private final DeleteBookByIdUseCaseService deleteBookByIdUseCaseService;
     private final Logger logger;
 
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
+    public BookController(GetAllBooksUseCaseService getAllBooksUseCaseService,
+                          GetBookByIdUseCaseService getBookByIdUseCaseService,
+                          UpdateBookUseCaseService updateBookUseCaseService,
+                          DeleteBookByIdUseCaseService deleteBookByIdUseCaseService) {
+        this.updateBookUseCaseService = updateBookUseCaseService;
+        this.getAllBooksUseCaseService = getAllBooksUseCaseService;
+        this.getBookByIdUseCaseService = getBookByIdUseCaseService;
+        this.deleteBookByIdUseCaseService = deleteBookByIdUseCaseService;
         this.logger = LoggerFactory.getLogger(getClass());
     }
 
     @GetMapping("/{id}")
     public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable UUID id) {
         logger.info("BookController::getBookById({})", id);
-        return bookService.getBookById(id)
+        return getBookByIdUseCaseService.getBookById(id)
                 .map(BookDto::of)
                 .map(ResponseEntity::ok);
     }
@@ -41,7 +53,7 @@ public class BookController {
     public Mono<ResponseEntity<BookDto>> updateBookBy(@RequestBody BookDto bookDto) {
         logger.info("BookController::updateBookBy({})", bookDto);
         var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title());
-        return bookService.updateBook(book)
+        return updateBookUseCaseService.updateBook(book)
                 .map(BookDto::of)
                 .map(ResponseEntity::ok);
     }
@@ -49,14 +61,14 @@ public class BookController {
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deleteBookById(@PathVariable UUID id) {
         logger.info("BookController::deleteBookById({})", id);
-        return bookService.deleteById(id)
+        return deleteBookByIdUseCaseService.deleteById(id)
                 .thenReturn(ResponseEntity.noContent().<Void>build());
     }
 
     @GetMapping
     public Mono<ResponseEntity<List<BookDto>>> getAllBooks() {
         logger.info("BookController::getAllBooks()");
-        return bookService.getAllBooks()
+        return getAllBooksUseCaseService.getAllBooks()
                 .map(BookDto::of)
                 .collectList()
                 .map(ResponseEntity::ok);
