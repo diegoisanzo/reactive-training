@@ -1,6 +1,7 @@
 package ar.training.reactive.adapter.inbound.rest;
 
 import ar.training.reactive.domain.model.Book;
+import ar.training.reactive.domain.service.CreateBookUseCaseService;
 import ar.training.reactive.domain.service.DeleteBookByIdUseCaseService;
 import ar.training.reactive.domain.service.UpdateBookUseCaseService;
 import ar.training.reactive.domain.service.GetAllBooksUseCaseService;
@@ -10,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,21 +27,44 @@ import java.util.UUID;
 @RequestMapping("/v1/books")
 public class BookController {
 
+    private final CreateBookUseCaseService createBookUseCaseService;
     private final GetAllBooksUseCaseService getAllBooksUseCaseService;
     private final GetBookByIdUseCaseService getBookByIdUseCaseService;
     private final UpdateBookUseCaseService updateBookUseCaseService;
     private final DeleteBookByIdUseCaseService deleteBookByIdUseCaseService;
     private final Logger logger;
 
-    public BookController(GetAllBooksUseCaseService getAllBooksUseCaseService,
+    public BookController(CreateBookUseCaseService createBookUseCaseService,
+                          GetAllBooksUseCaseService getAllBooksUseCaseService,
                           GetBookByIdUseCaseService getBookByIdUseCaseService,
                           UpdateBookUseCaseService updateBookUseCaseService,
                           DeleteBookByIdUseCaseService deleteBookByIdUseCaseService) {
+        this.createBookUseCaseService = createBookUseCaseService;
         this.updateBookUseCaseService = updateBookUseCaseService;
         this.getAllBooksUseCaseService = getAllBooksUseCaseService;
         this.getBookByIdUseCaseService = getBookByIdUseCaseService;
         this.deleteBookByIdUseCaseService = deleteBookByIdUseCaseService;
         this.logger = LoggerFactory.getLogger(getClass());
+    }
+
+    @PostMapping
+    public Mono<ResponseEntity<BookDto>> createBook(@RequestBody CreateBookDto createBookDto) {
+        logger.info("BookController::createBook()");
+        var book = new Book(UUID.randomUUID(), createBookDto.isbn(), createBookDto.title());
+        return createBookUseCaseService.createBook(book)
+                .map(BookDto::of)
+                .map(ResponseEntity::ok);
+    }
+
+
+    @GetMapping
+    // TODO: check the type of this response, something's not right
+    public Mono<ResponseEntity<List<BookDto>>> getAllBooks() {
+        logger.info("BookController::getAllBooks()");
+        return getAllBooksUseCaseService.getAllBooks()
+                .map(BookDto::of)
+                .collectList()
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
@@ -63,14 +89,5 @@ public class BookController {
         logger.info("BookController::deleteBookById({})", id);
         return deleteBookByIdUseCaseService.deleteById(id)
                 .thenReturn(ResponseEntity.noContent().<Void>build());
-    }
-
-    @GetMapping
-    public Mono<ResponseEntity<List<BookDto>>> getAllBooks() {
-        logger.info("BookController::getAllBooks()");
-        return getAllBooksUseCaseService.getAllBooks()
-                .map(BookDto::of)
-                .collectList()
-                .map(ResponseEntity::ok);
     }
 }

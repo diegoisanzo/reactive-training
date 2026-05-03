@@ -6,6 +6,8 @@ import ar.training.reactive.domain.model.Book;
 import ar.training.reactive.domain.service.UpdateBookUseCaseService;
 import ar.training.reactive.fixture.BookDtoFixture;
 import ar.training.reactive.fixture.BookFixture;
+import ar.training.reactive.fixture.CreateBookDtoFixture;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -52,6 +56,22 @@ class BookApplicationTests {
         bookRepository.deleteAll()
                 .thenMany(Flux.fromIterable(BookFixture.all()).flatMap(template::insert))
                 .blockLast();
+    }
+
+    @Test
+    void shouldCreateBook() {
+        var createBookDto = CreateBookDtoFixture.withDefaults();
+        webTestClient.post()
+                .uri("/v1/books")
+                .bodyValue(createBookDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BookDto.class)
+                .value(newBookDto -> {
+                    assertNotNull(newBookDto.id());
+                    assertEquals(createBookDto.isbn(), newBookDto.isbn());
+                    assertEquals(createBookDto.title(), newBookDto.title());
+                });
     }
 
     @Test
