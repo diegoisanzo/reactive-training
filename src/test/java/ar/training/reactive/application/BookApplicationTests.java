@@ -61,6 +61,7 @@ class BookApplicationTests {
                 .expectStatus().isOk()
                 .expectBody(BookDto.class)
                 .value(newBookDto -> {
+                    assertNotNull(newBookDto);
                     assertNotNull(newBookDto.id());
                     assertEquals(createBookDto.isbn(), newBookDto.isbn());
                     assertEquals(createBookDto.title(), newBookDto.title());
