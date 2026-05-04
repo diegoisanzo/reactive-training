@@ -20,7 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
-import static ar.training.reactive.adapter.inbound.rest.BookController.BY_ID;
+import static ar.training.reactive.adapter.inbound.rest.BookController.BOOK_BY_ID_PATH;
 import static ar.training.reactive.adapter.inbound.rest.BookController.BOOK_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -85,7 +85,7 @@ class BookControllerApplicationTests {
     void shouldReturnBookById() {
         var expected = BookDtoFixture.withDefaults();
         webTestClient.get()
-                .uri(BOOK_PATH + BY_ID, expected.id())
+                .uri(BOOK_BY_ID_PATH, expected.id())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(BookDto.class)
@@ -100,7 +100,7 @@ class BookControllerApplicationTests {
         expectedProblemDetail.setInstance(new URI("/v1/books/%s".formatted(id)));
 
         webTestClient.get()
-                .uri(BOOK_PATH + BY_ID, id)
+                .uri(BOOK_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ProblemDetail.class)
@@ -133,7 +133,7 @@ class BookControllerApplicationTests {
     void shouldDeleteBook() {
         var id = BookDtoFixture.withDefaults().id();
         webTestClient.delete()
-                .uri(BOOK_PATH + BY_ID, id)
+                .uri(BOOK_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().isNoContent();
     }
@@ -141,7 +141,7 @@ class BookControllerApplicationTests {
     @Test
     void shouldReturn404WhenDeletingNonExistentBook() {
         webTestClient.delete()
-                .uri(BOOK_PATH + BY_ID, UUID.randomUUID())
+                .uri(BOOK_BY_ID_PATH, UUID.randomUUID())
                 .exchange()
                 .expectStatus().isNotFound();
     }

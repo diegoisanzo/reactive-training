@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,11 +22,10 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(BookController.BOOK_PATH)
 public class BookController {
 
     static final String BOOK_PATH = "/v1/books";
-    static final String BY_ID = "/{id}";
+    static final String BOOK_BY_ID_PATH = BOOK_PATH + "/{id}";
 
     private final CreateBookUseCaseService createBookUseCaseService;
     private final GetAllBooksUseCaseService getAllBooksUseCaseService;
@@ -49,7 +47,7 @@ public class BookController {
         this.logger = LoggerFactory.getLogger(getClass());
     }
 
-    @PostMapping
+    @PostMapping(BOOK_PATH)
     public Mono<ResponseEntity<BookDto>> createBook(@RequestBody CreateBookDto createBookDto) {
         logger.info("BookController::createBook()");
         var book = new Book(UUID.randomUUID(), createBookDto.isbn(), createBookDto.title());
@@ -59,7 +57,7 @@ public class BookController {
     }
 
 
-    @GetMapping
+    @GetMapping(BOOK_PATH)
     // TODO: check the type of this response, something's not right
     public Flux<BookDto> getAllBooks() {
         logger.info("BookController::getAllBooks()");
@@ -67,7 +65,7 @@ public class BookController {
                 .map(BookDto::of);
     }
 
-    @GetMapping(BY_ID)
+    @GetMapping(BOOK_BY_ID_PATH)
     public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable UUID id) {
         logger.info("BookController::getBookById({})", id);
         return getBookByIdUseCaseService.getBookById(id)
@@ -75,7 +73,7 @@ public class BookController {
                 .map(ResponseEntity::ok);
     }
 
-    @PutMapping
+    @PutMapping(BOOK_PATH)
     public Mono<ResponseEntity<BookDto>> updateBookBy(@RequestBody BookDto bookDto) {
         logger.info("BookController::updateBookBy({})", bookDto);
         var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title());
@@ -84,7 +82,7 @@ public class BookController {
                 .map(ResponseEntity::ok);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(BOOK_BY_ID_PATH)
     public Mono<ResponseEntity<Void>> deleteBookById(@PathVariable UUID id) {
         logger.info("BookController::deleteBookById({})", id);
         return deleteBookByIdUseCaseService.deleteById(id)
