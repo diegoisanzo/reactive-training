@@ -1,7 +1,7 @@
-package ar.training.reactive.application;
+package ar.training.reactive.adapter.inbound.rest;
 
-import ar.training.reactive.adapter.inbound.rest.BookDto;
 import ar.training.reactive.adapter.outbound.persistence.R2dbcBookRepository;
+import ar.training.reactive.application.SharedContainers;
 import ar.training.reactive.fixture.BookDtoFixture;
 import ar.training.reactive.fixture.BookFixture;
 import ar.training.reactive.fixture.CreateBookDtoFixture;
@@ -20,6 +20,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
+import static ar.training.reactive.adapter.inbound.rest.BookController.BY_ID;
+import static ar.training.reactive.adapter.inbound.rest.BookController.BOOK_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -28,14 +30,14 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
-class BookApplicationTests {
+class BookControllerApplicationTests {
 
     private final WebTestClient webTestClient;
     private final R2dbcBookRepository bookRepository;
     private final R2dbcEntityTemplate template;
 
     @Autowired
-    BookApplicationTests(
+    BookControllerApplicationTests(
             WebTestClient webTestClient,
             R2dbcBookRepository bookRepository,
             R2dbcEntityTemplate template) {
@@ -55,7 +57,7 @@ class BookApplicationTests {
     void shouldCreateBook() {
         var createBookDto = CreateBookDtoFixture.withDefaults();
         webTestClient.post()
-                .uri("/v1/books")
+                .uri(BOOK_PATH)
                 .bodyValue(createBookDto)
                 .exchange()
                 .expectStatus().isOk()
@@ -71,7 +73,7 @@ class BookApplicationTests {
     @Test
     void shouldReturnAllBooks() {
         webTestClient.get()
-                .uri("/v1/books")
+                .uri(BOOK_PATH)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(BookDto.class)
@@ -83,7 +85,7 @@ class BookApplicationTests {
     void shouldReturnBookById() {
         var expected = BookDtoFixture.withDefaults();
         webTestClient.get()
-                .uri("/v1/books/{id}", expected.id())
+                .uri(BOOK_PATH + BY_ID, expected.id())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(BookDto.class)
@@ -98,7 +100,7 @@ class BookApplicationTests {
         expectedProblemDetail.setInstance(new URI("/v1/books/%s".formatted(id)));
 
         webTestClient.get()
-                .uri("/v1/books/{id}", id)
+                .uri(BOOK_PATH + BY_ID, id)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ProblemDetail.class)
@@ -109,7 +111,7 @@ class BookApplicationTests {
     void shouldUpdateBookViaHttp() {
         var updated = BookDtoFixture.withUpdatesToDefault();
         webTestClient.put()
-                .uri("/v1/books")
+                .uri(BOOK_PATH)
                 .bodyValue(updated)
                 .exchange()
                 .expectStatus().isOk()
@@ -121,7 +123,7 @@ class BookApplicationTests {
     void shouldReturn404WhenUpdatingNonExistentBook() {
         var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown");
         webTestClient.put()
-                .uri("/v1/books")
+                .uri(BOOK_PATH)
                 .bodyValue(nonExistent)
                 .exchange()
                 .expectStatus().isNotFound();
@@ -131,7 +133,7 @@ class BookApplicationTests {
     void shouldDeleteBook() {
         var id = BookDtoFixture.withDefaults().id();
         webTestClient.delete()
-                .uri("/v1/books/{id}", id)
+                .uri(BOOK_PATH + BY_ID, id)
                 .exchange()
                 .expectStatus().isNoContent();
     }
@@ -139,7 +141,7 @@ class BookApplicationTests {
     @Test
     void shouldReturn404WhenDeletingNonExistentBook() {
         webTestClient.delete()
-                .uri("/v1/books/{id}", UUID.randomUUID())
+                .uri(BOOK_PATH + BY_ID, UUID.randomUUID())
                 .exchange()
                 .expectStatus().isNotFound();
     }

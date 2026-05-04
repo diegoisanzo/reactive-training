@@ -23,8 +23,11 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/books")
+@RequestMapping(BookController.BOOK_PATH)
 public class BookController {
+
+    static final String BOOK_PATH = "/v1/books";
+    static final String BY_ID = "/{id}";
 
     private final CreateBookUseCaseService createBookUseCaseService;
     private final GetAllBooksUseCaseService getAllBooksUseCaseService;
@@ -64,7 +67,7 @@ public class BookController {
                 .map(BookDto::of);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(BY_ID)
     public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable UUID id) {
         logger.info("BookController::getBookById({})", id);
         return getBookByIdUseCaseService.getBookById(id)

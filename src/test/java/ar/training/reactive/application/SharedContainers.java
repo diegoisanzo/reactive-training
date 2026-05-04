@@ -3,7 +3,7 @@ package ar.training.reactive.application;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
-class SharedContainers {
+public class SharedContainers {
 
     @ServiceConnection
     static final PostgreSQLContainer postgresSQLContainer =
