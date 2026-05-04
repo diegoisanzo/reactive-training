@@ -1,6 +1,6 @@
 package ar.training.reactive.fixture;
 
-import ar.training.reactive.adapter.outbound.persistence.BookDBData;
+import ar.training.reactive.infrastructure.adapter.out.persistence.BookDBData;
 import ar.training.reactive.domain.model.Book;
 
 import java.util.List;

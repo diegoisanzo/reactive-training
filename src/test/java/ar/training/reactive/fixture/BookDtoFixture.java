@@ -1,6 +1,6 @@
 package ar.training.reactive.fixture;
 
-import ar.training.reactive.adapter.inbound.rest.BookDto;
+import ar.training.reactive.infrastructure.adapter.in.rest.BookDto;
 
 public class BookDtoFixture {
 
