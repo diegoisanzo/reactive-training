@@ -97,7 +97,9 @@ class BookControllerApplicationTests {
         var id = UUID.randomUUID();
         var expectedProblemDetail = ProblemDetail.forStatusAndDetail(NOT_FOUND, "Book with id %s not found".formatted(id));
         expectedProblemDetail.setTitle("Book not found");
-        expectedProblemDetail.setInstance(new URI("/v1/books/%s".formatted(id)));
+        var bookById = new URI(BOOK_BY_ID_PATH
+            .replace("{id}", id.toString()));
+        expectedProblemDetail.setInstance(bookById);
 
         webTestClient.get()
                 .uri(BOOK_BY_ID_PATH, id)
