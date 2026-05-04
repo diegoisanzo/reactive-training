@@ -11,16 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -59,12 +58,10 @@ public class BookController {
 
     @GetMapping
     // TODO: check the type of this response, something's not right
-    public Mono<ResponseEntity<List<BookDto>>> getAllBooks() {
+    public Flux<BookDto> getAllBooks() {
         logger.info("BookController::getAllBooks()");
         return getAllBooksUseCaseService.getAllBooks()
-                .map(BookDto::of)
-                .collectList()
-                .map(ResponseEntity::ok);
+                .map(BookDto::of);
     }
 
     @GetMapping("/{id}")

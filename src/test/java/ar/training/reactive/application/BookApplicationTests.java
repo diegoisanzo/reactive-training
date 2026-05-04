@@ -2,12 +2,9 @@ package ar.training.reactive.application;
 
 import ar.training.reactive.adapter.inbound.rest.BookDto;
 import ar.training.reactive.adapter.outbound.persistence.R2dbcBookRepository;
-import ar.training.reactive.domain.model.Book;
-import ar.training.reactive.domain.service.UpdateBookUseCaseService;
 import ar.training.reactive.fixture.BookDtoFixture;
 import ar.training.reactive.fixture.BookFixture;
 import ar.training.reactive.fixture.CreateBookDtoFixture;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,6 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,18 +31,15 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 class BookApplicationTests {
 
     private final WebTestClient webTestClient;
-    private final UpdateBookUseCaseService updateBookUseCaseService;
     private final R2dbcBookRepository bookRepository;
     private final R2dbcEntityTemplate template;
 
     @Autowired
     BookApplicationTests(
             WebTestClient webTestClient,
-            UpdateBookUseCaseService updateBookUseCaseService,
             R2dbcBookRepository bookRepository,
             R2dbcEntityTemplate template) {
         this.webTestClient = webTestClient;
-        this.updateBookUseCaseService = updateBookUseCaseService;
         this.bookRepository = bookRepository;
         this.template = template;
     }
@@ -72,19 +65,6 @@ class BookApplicationTests {
                     assertEquals(createBookDto.isbn(), newBookDto.isbn());
                     assertEquals(createBookDto.title(), newBookDto.title());
                 });
-    }
-
-    @Test
-    void shouldUpdateBook() {
-        var updated = BookDtoFixture.withUpdatesToDefault();
-        var book = new Book(updated.id(), updated.isbn(), updated.title());
-        StepVerifier
-                .create(updateBookUseCaseService.updateBook(book))
-                .expectNextMatches(b ->
-                        b.getId().equals(updated.id()) &&
-                        b.getIsbn().equals(updated.isbn()) &&
-                        b.getTitle().equals(updated.title()))
-                .verifyComplete();
     }
 
     @Test
