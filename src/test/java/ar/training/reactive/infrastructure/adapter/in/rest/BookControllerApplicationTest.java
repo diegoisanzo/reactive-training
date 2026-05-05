@@ -5,7 +5,6 @@ import ar.training.reactive.SharedContainers;
 import ar.training.reactive.fixture.BookDtoFixture;
 import ar.training.reactive.fixture.BookFixture;
 import ar.training.reactive.fixture.CreateBookDtoFixture;
-import ar.training.reactive.infrastructure.adapter.in.rest.BookDto;
 import ar.training.reactive.infrastructure.adapter.out.persistence.R2dbcBookRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,11 +15,13 @@ import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTest
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_BY_ID_PATH;
 import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_PATH;
@@ -32,14 +33,14 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
-class BookControllerApplicationTests {
+class BookControllerApplicationTest {
 
     private final WebTestClient webTestClient;
     private final R2dbcBookRepository bookRepository;
     private final R2dbcEntityTemplate template;
 
     @Autowired
-    BookControllerApplicationTests(
+    BookControllerApplicationTest(
             WebTestClient webTestClient,
             R2dbcBookRepository bookRepository,
             R2dbcEntityTemplate template) {
