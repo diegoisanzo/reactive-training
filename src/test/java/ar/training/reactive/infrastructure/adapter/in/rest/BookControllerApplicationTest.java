@@ -15,13 +15,11 @@ import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTest
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_BY_ID_PATH;
 import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_PATH;
