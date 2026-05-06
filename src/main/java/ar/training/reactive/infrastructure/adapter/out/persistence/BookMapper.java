@@ -1,16 +1,12 @@
 package ar.training.reactive.infrastructure.adapter.out.persistence;
 
 import ar.training.reactive.domain.model.Book;
+import org.mapstruct.Mapper;
 
-public final class BookMapper {
+@Mapper(componentModel = "spring")
+public interface BookMapper {
 
-    private BookMapper() {}
+    Book toDomain(BookEntity entity);
 
-    public static Book toDomain(BookEntity entity) {
-        return new Book(entity.getId(), entity.getIsbn(), entity.getTitle());
-    }
-
-    public static BookEntity toEntity(Book book) {
-        return new BookEntity(book.getId(), book.getIsbn(), book.getTitle());
-    }
+    BookEntity toEntity(Book book);
 }

@@ -12,31 +12,33 @@ import java.util.UUID;
 public class BookRepositoryOutboundAdapter implements BookRepositoryOutboundPort {
 
     private final R2dbcBookRepository repository;
+    private final BookMapper mapper;
 
-    public BookRepositoryOutboundAdapter(R2dbcBookRepository repository) {
+    public BookRepositoryOutboundAdapter(R2dbcBookRepository repository, BookMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
     public Mono<Book> findById(UUID id) {
         return repository.findById(id)
-                .map(BookMapper::toDomain);
+                .map(mapper::toDomain);
     }
 
     @Override
     public Flux<Book> findAll() {
         return repository.findAll()
-                .map(BookMapper::toDomain);
+                .map(mapper::toDomain);
     }
 
     @Override
     public Mono<Book> save(Book book) {
-        return repository.save(BookMapper.toEntity(book))
-                .map(BookMapper::toDomain);
+        return repository.save(mapper.toEntity(book))
+                .map(mapper::toDomain);
     }
 
     @Override
     public Mono<Void> delete(Book book) {
-        return repository.delete(BookMapper.toEntity(book));
+        return repository.delete(mapper.toEntity(book));
     }
 }
