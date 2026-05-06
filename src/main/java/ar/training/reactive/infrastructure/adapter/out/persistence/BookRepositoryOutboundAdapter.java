@@ -22,23 +22,23 @@ public class BookRepositoryOutboundAdapter implements BookRepositoryOutboundPort
     @Override
     public Mono<Book> findById(UUID id) {
         return repository.findById(id)
-                .map(mapper::toDomain);
+                .map(mapper::toBook);
     }
 
     @Override
     public Flux<Book> findAll() {
         return repository.findAll()
-                .map(mapper::toDomain);
+                .map(mapper::toBook);
     }
 
     @Override
     public Mono<Book> save(Book book) {
-        return repository.save(mapper.toEntity(book))
-                .map(mapper::toDomain);
+        return repository.save(mapper.toBookEntity(book))
+                .map(mapper::toBook);
     }
 
     @Override
     public Mono<Void> delete(Book book) {
-        return repository.delete(mapper.toEntity(book));
+        return repository.delete(mapper.toBookEntity(book));
     }
 }
