@@ -6,6 +6,7 @@ import ar.training.reactive.application.port.in.DeleteBookByIdInboundPort;
 import ar.training.reactive.application.port.in.GetAllBooksInboundPort;
 import ar.training.reactive.application.port.in.GetBookByIdInboundPort;
 import ar.training.reactive.application.port.in.UpdateBookInboundPort;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class BookController {
     }
 
     @PostMapping(BOOK_PATH)
-    public Mono<ResponseEntity<BookDto>> createBook(@RequestBody CreateBookDto createBookDto) {
+    public Mono<ResponseEntity<BookDto>> createBook(@Valid @RequestBody CreateBookDto createBookDto) {
         logger.info("BookController::createBook()");
         var book = new Book(UUID.randomUUID(), createBookDto.isbn(), createBookDto.title());
         return createBookInboundPort.createBook(book)
@@ -73,7 +74,7 @@ public class BookController {
     }
 
     @PutMapping(BOOK_PATH)
-    public Mono<ResponseEntity<BookDto>> updateBookBy(@RequestBody BookDto bookDto) {
+    public Mono<ResponseEntity<BookDto>> updateBookBy(@Valid @RequestBody BookDto bookDto) {
         logger.info("BookController::updateBookBy({})", bookDto);
         var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title());
         return updateBookInboundPort.updateBook(book)

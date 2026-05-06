@@ -148,4 +148,155 @@ class BookControllerApplicationTest {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
+    // Create validation tests
+    @Test
+    void shouldReturn400WhenCreatingBookWithNullIsbn() {
+        var invalidDto = new CreateBookDto(null, "Valid Title");
+        webTestClient.post()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class)
+                .consumeWith(result -> {
+                    var detail = result.getResponseBody();
+                    assertEquals(400, detail.getStatus());
+                });
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithEmptyIsbn() {
+        var invalidDto = new CreateBookDto("", "Valid Title");
+        webTestClient.post()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithIsbnExceedingMaxLength() {
+        var invalidDto = new CreateBookDto("12345678901234", "Valid Title");
+        webTestClient.post()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithNullTitle() {
+        var invalidDto = new CreateBookDto("9780000000000", null);
+        webTestClient.post()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithEmptyTitle() {
+        var invalidDto = new CreateBookDto("9780000000000", "");
+        webTestClient.post()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithTitleExceedingMaxLength() {
+        var longTitle = "a".repeat(256);
+        var invalidDto = new CreateBookDto("9780000000000", longTitle);
+        webTestClient.post()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    // Update validation tests
+    @Test
+    void shouldReturn400WhenUpdatingBookWithNullId() {
+        var invalidDto = new BookDto(null, "9780000000000", "Valid Title");
+        webTestClient.put()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithNullIsbn() {
+        var invalidDto = new BookDto(UUID.randomUUID(), null, "Valid Title");
+        webTestClient.put()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithEmptyIsbn() {
+        var invalidDto = new BookDto(UUID.randomUUID(), "", "Valid Title");
+        webTestClient.put()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithIsbnExceedingMaxLength() {
+        var invalidDto = new BookDto(UUID.randomUUID(), "12345678901234", "Valid Title");
+        webTestClient.put()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithNullTitle() {
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", null);
+        webTestClient.put()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithEmptyTitle() {
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "");
+        webTestClient.put()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithTitleExceedingMaxLength() {
+        var longTitle = "a".repeat(256);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle);
+        webTestClient.put()
+                .uri(BOOK_PATH)
+                .bodyValue(invalidDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class);
+    }
 }
