@@ -1,11 +1,11 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
-import ar.training.reactive.domain.model.Book;
 import ar.training.reactive.application.port.in.CreateBookInboundPort;
 import ar.training.reactive.application.port.in.DeleteBookByIdInboundPort;
 import ar.training.reactive.application.port.in.GetAllBooksInboundPort;
 import ar.training.reactive.application.port.in.GetBookByIdInboundPort;
 import ar.training.reactive.application.port.in.UpdateBookInboundPort;
+import ar.training.reactive.domain.model.Book;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

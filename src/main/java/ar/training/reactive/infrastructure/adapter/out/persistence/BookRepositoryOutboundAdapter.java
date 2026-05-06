@@ -1,7 +1,7 @@
 package ar.training.reactive.infrastructure.adapter.out.persistence;
 
-import ar.training.reactive.domain.model.Book;
 import ar.training.reactive.application.port.out.BookRepositoryOutboundPort;
+import ar.training.reactive.domain.model.Book;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

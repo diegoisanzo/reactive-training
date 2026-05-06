@@ -1,10 +1,10 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
+import ar.training.reactive.SharedContainers;
 import ar.training.reactive.application.usecase.CreateBookUseCase;
 import ar.training.reactive.application.usecase.DeleteBookByIdUseCase;
 import ar.training.reactive.application.usecase.GetAllBooksUseCase;
 import ar.training.reactive.application.usecase.GetBookByIdUseCase;
-import ar.training.reactive.SharedContainers;
 import ar.training.reactive.application.usecase.UpdateBookUseCase;
 import ar.training.reactive.infrastructure.adapter.out.persistence.BookRepositoryOutboundAdapter;
 import org.junit.jupiter.api.Test;
