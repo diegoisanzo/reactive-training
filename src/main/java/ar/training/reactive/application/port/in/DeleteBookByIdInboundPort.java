@@ -5,5 +5,5 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface DeleteBookByIdInboundPort {
-    Mono<Void> deleteById(UUID id);
+    Mono<Void> deleteBookById(UUID id);
 }

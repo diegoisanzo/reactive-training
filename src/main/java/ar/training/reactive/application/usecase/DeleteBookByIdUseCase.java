@@ -17,7 +17,7 @@ public class DeleteBookByIdUseCase implements DeleteBookByIdInboundPort {
         this.bookRepository = bookRepository;
     }
 
-    public Mono<Void> deleteById(UUID id) {
+    public Mono<Void> deleteBookById(UUID id) {
         return bookRepository.findById(id)
                 .switchIfEmpty(Mono.error(new BookNotFoundException(id)))
                 .flatMap(bookRepository::delete);

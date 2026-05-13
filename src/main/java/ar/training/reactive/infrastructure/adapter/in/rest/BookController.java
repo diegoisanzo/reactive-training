@@ -85,7 +85,7 @@ public class BookController {
     @DeleteMapping(BOOK_BY_ID_PATH)
     public Mono<ResponseEntity<Void>> deleteBookById(@PathVariable UUID id) {
         logger.info("BookController::deleteBookById({})", id);
-        return deleteBookByIdInboundPort.deleteById(id)
-                .thenReturn(ResponseEntity.noContent().<Void>build());
+        return deleteBookByIdInboundPort.deleteBookById(id)
+                .thenReturn(ResponseEntity.noContent().build());
     }
 }
