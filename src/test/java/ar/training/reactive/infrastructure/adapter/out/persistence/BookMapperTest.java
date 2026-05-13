@@ -39,8 +39,8 @@ public class BookMapperTest {
 
         assertNotNull(bookEntity);
 
-        assertEquals(bookEntity.getId(), book.getId());
-        assertEquals(bookEntity.getIsbn(), book.getIsbn());
-        assertEquals(bookEntity.getTitle(), book.getTitle());
+        assertEquals(book.getId(), bookEntity.getId());
+        assertEquals(book.getIsbn(), bookEntity.getIsbn());
+        assertEquals(book.getTitle(), bookEntity.getTitle());
     }
 }
