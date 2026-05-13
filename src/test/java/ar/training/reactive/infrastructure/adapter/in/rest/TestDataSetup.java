@@ -18,7 +18,10 @@ public class TestDataSetup {
 
     public void refresh() {
         bookRepository.deleteAll()
-            .thenMany(Flux.fromIterable(BookFixture.all()).flatMap(template::insert))
+            .thenMany(
+                Flux.fromIterable(BookFixture.all())
+                    .flatMap(template::insert)
+            )
             .blockLast();
     }
 }
