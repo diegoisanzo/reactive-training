@@ -78,9 +78,9 @@ public class BookController {
     }
 
     @PutMapping(BOOK_PATH)
-    @TimeLimiter(name = "updateBookByTimeout")
-    public Mono<ResponseEntity<BookDto>> updateBookBy(@Valid @RequestBody BookDto bookDto) {
-        logger.info("BookController::updateBookBy({})", bookDto);
+    @TimeLimiter(name = "updateBookTimeout")
+    public Mono<ResponseEntity<BookDto>> updateBook(@Valid @RequestBody BookDto bookDto) {
+        logger.info("BookController::updateBook({})", bookDto);
         var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title());
         return updateBookInboundPort.updateBook(book)
                 .map(BookDto::of)
@@ -88,7 +88,7 @@ public class BookController {
     }
 
     @DeleteMapping(BOOK_BY_ID_PATH)
-    @TimeLimiter(name = "deleteBookByTimeout")
+    @TimeLimiter(name = "deleteBookByIdTimeout")
     public Mono<ResponseEntity<Void>> deleteBookById(@PathVariable UUID id) {
         logger.info("BookController::deleteBookById({})", id);
         return deleteBookByIdInboundPort.deleteBookById(id)
