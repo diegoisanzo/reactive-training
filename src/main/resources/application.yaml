@@ -17,3 +17,22 @@ spring:
 #    properties:
 #      hibernate:
 #        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+resilience4j:
+  timelimiter:
+    instances:
+      createBookTimeout:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
+      getBookByIdTimeout:
+        timeoutDuration: 1s
+        cancelRunningFuture: true
+      getAllBooksTimeout:
+        timeoutDuration: 3s
+        cancelRunningFuture: true
+      updateBookTimeout:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
+      deleteBookByIdTimeout:
+        timeoutDuration: 1s
+        cancelRunningFuture: true

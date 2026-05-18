@@ -6,6 +6,7 @@ import ar.training.reactive.application.port.in.GetAllBooksInboundPort;
 import ar.training.reactive.application.port.in.GetBookByIdInboundPort;
 import ar.training.reactive.application.port.in.UpdateBookInboundPort;
 import ar.training.reactive.domain.model.Book;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class BookController {
     }
 
     @PostMapping(BOOK_PATH)
+    @TimeLimiter(name = "createBookTimeout")
     public Mono<ResponseEntity<BookDto>> createBook(@Valid @RequestBody CreateBookDto createBookDto) {
         logger.info("BookController::createBook()");
         var book = new Book(UUID.randomUUID(), createBookDto.isbn(), createBookDto.title());
@@ -59,6 +61,7 @@ public class BookController {
 
 
     @GetMapping(BOOK_PATH)
+    @TimeLimiter(name = "getAllBooksTimeout")
     public Flux<BookDto> getAllBooks() {
         logger.info("BookController::getAllBooks()");
         return getAllBooksInboundPort.getAllBooks()
@@ -66,6 +69,7 @@ public class BookController {
     }
 
     @GetMapping(BOOK_BY_ID_PATH)
+    @TimeLimiter(name = "getBookByIdTimeout")
     public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable UUID id) {
         logger.info("BookController::getBookById({})", id);
         return getBookByIdInboundPort.getBookById(id)
@@ -74,6 +78,7 @@ public class BookController {
     }
 
     @PutMapping(BOOK_PATH)
+    @TimeLimiter(name = "updateBookByTimeout")
     public Mono<ResponseEntity<BookDto>> updateBookBy(@Valid @RequestBody BookDto bookDto) {
         logger.info("BookController::updateBookBy({})", bookDto);
         var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title());
@@ -83,6 +88,7 @@ public class BookController {
     }
 
     @DeleteMapping(BOOK_BY_ID_PATH)
+    @TimeLimiter(name = "deleteBookByTimeout")
     public Mono<ResponseEntity<Void>> deleteBookById(@PathVariable UUID id) {
         logger.info("BookController::deleteBookById({})", id);
         return deleteBookByIdInboundPort.deleteBookById(id)
