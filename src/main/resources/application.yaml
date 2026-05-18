@@ -36,3 +36,25 @@ resilience4j:
       deleteBookByIdTimeout:
         timeoutDuration: 1s
         cancelRunningFuture: true
+  ratelimiter:
+    instances:
+      createBookRateLimit:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0ms
+      getAllBooksRateLimit:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0ms
+      getBookByIdRateLimit:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0ms
+      updateBookRateLimit:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0ms
+      deleteBookByIdRateLimit:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0ms

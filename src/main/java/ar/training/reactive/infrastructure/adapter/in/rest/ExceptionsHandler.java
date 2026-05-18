@@ -1,6 +1,7 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
 import ar.training.reactive.domain.exception.BookNotFoundException;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.ProblemDetail.forStatus;
 
 @RestControllerAdvice
@@ -29,13 +31,20 @@ public class ExceptionsHandler {
                 .build();
     }
 
+    @ExceptionHandler(RequestNotPermitted.class)
+    public ResponseEntity<ProblemDetail> handleRateLimitExceeded(RequestNotPermitted ex) {
+        var detail = forStatus(TOO_MANY_REQUESTS);
+        detail.setTitle("Rate limit exceeded");
+        return ResponseEntity.of(detail).build();
+    }
+
     @ExceptionHandler(WebExchangeBindException.class)
     public ResponseEntity<ProblemDetail> handleValidationException(
             WebExchangeBindException ex,
             ServerWebExchange exchange) {
         var fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> Map.of(
-                        "field", (Object) error.getField(),
+                        "field", error.getField(),
                         "rejectedValue", error.getRejectedValue(),
                         "message", error.getDefaultMessage()
                 ))
@@ -49,5 +58,4 @@ public class ExceptionsHandler {
 
         return ResponseEntity.badRequest().body(problemDetail);
     }
-
 }
