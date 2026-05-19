@@ -70,6 +70,28 @@ HTTP request
 
 The controller depends on inbound port interfaces, not concrete use case classes. Swapping an implementation requires no change to the controller.
 
+## Resilience
+
+Resilience patterns are applied at the controller layer via Resilience4j annotations. Each endpoint has its own named instance, configured independently in `application.yaml`.
+
+### Time Limiter
+
+`@TimeLimiter` enforces a per-endpoint timeout on the reactive pipeline. If the operation exceeds the configured duration, the request fails with HTTP 500 (the default Spring WebFlux error response for a timeout signal propagated as an unhandled exception).
+
+| Endpoint          | Timeout |
+|-------------------|---------|
+| `POST /v1/books`  | 2s      |
+| `GET /v1/books`   | 3s      |
+| `GET /v1/books/{id}` | 1s   |
+| `PUT /v1/books`   | 2s      |
+| `DELETE /v1/books/{id}` | 1s |
+
+### Rate Limiter
+
+`@RateLimiter` limits the number of requests allowed per refresh period per endpoint. Excess requests are rejected immediately (`timeoutDuration: 0ms`) without queuing. `ExceptionsHandler` maps `RequestNotPermitted` → HTTP 429 with a `ProblemDetail` body (`title: "Rate limit exceeded"`).
+
+All endpoints share the same defaults: **100 requests / 1s** window.
+
 ## Running
 
 Requires PostgreSQL at `localhost:5432`, database `postgres`, user `postgres`, password `p`.
