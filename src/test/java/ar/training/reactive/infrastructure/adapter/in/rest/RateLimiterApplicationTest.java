@@ -46,53 +46,47 @@ class RateLimiterApplicationTest {
 
     @Test
     void shouldReturn429ForGetAllBooksWhenRateLimitExceeded() {
-        webTestClient.get().uri(BOOK_PATH).exchange().expectStatus().isOk();
-        webTestClient.get().uri(BOOK_PATH)
-                .exchange()
-                .expectStatus().isEqualTo(429)
-                .expectBody(ProblemDetail.class)
-                .value(this::assertRateLimitExceeded);
+        var getAllBooksRequest = webTestClient.get().uri(BOOK_PATH);
+        getAllBooksRequest.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(getAllBooksRequest.exchange());
     }
 
     @Test
     void shouldReturn429ForGetBookByIdWhenRateLimitExceeded() {
         var id = BookDtoFixture.withDefaults().id();
-        webTestClient.get().uri(BOOK_BY_ID_PATH, id).exchange().expectStatus().isOk();
-        webTestClient.get().uri(BOOK_BY_ID_PATH, id)
-                .exchange()
-                .expectStatus().isEqualTo(429)
-                .expectBody(ProblemDetail.class)
-                .value(this::assertRateLimitExceeded);
+        var getBookByIdRequest = webTestClient.get().uri(BOOK_BY_ID_PATH, id);
+        getBookByIdRequest.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(getBookByIdRequest.exchange());
     }
 
     @Test
     void shouldReturn429ForCreateBookWhenRateLimitExceeded() {
         var createBookDto = CreateBookDtoFixture.withDefaults();
-        webTestClient.post().uri(BOOK_PATH).bodyValue(createBookDto).exchange().expectStatus().isOk();
-        webTestClient.post().uri(BOOK_PATH).bodyValue(createBookDto)
-                .exchange()
-                .expectStatus().isEqualTo(429)
-                .expectBody(ProblemDetail.class)
-                .value(this::assertRateLimitExceeded);
+        var createBookRequest = webTestClient.post().uri(BOOK_PATH).bodyValue(createBookDto);
+        createBookRequest.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(createBookRequest.exchange());
     }
 
     @Test
     void shouldReturn429ForUpdateBookWhenRateLimitExceeded() {
         var bookDto = BookDtoFixture.withUpdatesToDefault();
-        webTestClient.put().uri(BOOK_PATH).bodyValue(bookDto).exchange().expectStatus().isOk();
-        webTestClient.put().uri(BOOK_PATH).bodyValue(bookDto)
-                .exchange()
-                .expectStatus().isEqualTo(429)
-                .expectBody(ProblemDetail.class)
-                .value(this::assertRateLimitExceeded);
+        var updateBookRequest = webTestClient.put().uri(BOOK_PATH).bodyValue(bookDto);
+        updateBookRequest.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(updateBookRequest.exchange());
     }
 
     @Test
     void shouldReturn429ForDeleteBookWhenRateLimitExceeded() {
         var id = BookDtoFixture.withDefaults().id();
-        webTestClient.delete().uri(BOOK_BY_ID_PATH, id).exchange().expectStatus().isNoContent();
-        webTestClient.delete().uri(BOOK_BY_ID_PATH, id)
-                .exchange()
+        var deleteBookByIdRequest = webTestClient.delete().uri(BOOK_BY_ID_PATH, id);
+
+        deleteBookByIdRequest.exchange().expectStatus().isNoContent();
+
+        assertIsStatus429AndRateLimitExceeded(deleteBookByIdRequest.exchange());
+    }
+
+    private void assertIsStatus429AndRateLimitExceeded(WebTestClient.ResponseSpec response) {
+        response
                 .expectStatus().isEqualTo(429)
                 .expectBody(ProblemDetail.class)
                 .value(this::assertRateLimitExceeded);
