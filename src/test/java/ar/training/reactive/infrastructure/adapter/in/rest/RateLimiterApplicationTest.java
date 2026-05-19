@@ -85,14 +85,14 @@ class RateLimiterApplicationTest {
         assertIsStatus429AndRateLimitExceeded(deleteBookByIdRequest.exchange());
     }
 
-    private void assertIsStatus429AndRateLimitExceeded(WebTestClient.ResponseSpec response) {
+    private static void assertIsStatus429AndRateLimitExceeded(WebTestClient.ResponseSpec response) {
         response
                 .expectStatus().isEqualTo(429)
                 .expectBody(ProblemDetail.class)
-                .value(this::assertRateLimitExceeded);
+                .value(RateLimiterApplicationTest::assertRateLimitExceeded);
     }
 
-    private void assertRateLimitExceeded(ProblemDetail pd) {
+    private static void assertRateLimitExceeded(ProblemDetail pd) {
         assertNotNull(pd);
         assertEquals("Rate limit exceeded", pd.getTitle());
         assertEquals(429, pd.getStatus());
