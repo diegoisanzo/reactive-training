@@ -87,7 +87,7 @@ The table schema and seed data are created at startup by `DBConfigCommandLineRun
 ./gradlew test
 
 # Single class
-./gradlew test --tests "ar.training.reactive.infrastructure.adapter.in.rest.BookControllerApplicationTest"
+./gradlew test --tests "ar.training.reactive.infrastructure.adapter.in.rest.GetAllBooksApplicationTest"
 ```
 
 Integration tests use Testcontainers (`postgres:16-alpine`). No mocks — all tests hit a real database.
