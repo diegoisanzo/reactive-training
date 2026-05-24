@@ -181,4 +181,26 @@ class CreateBookApplicationTest {
                     assertFalse(((String) requestIdValue).isBlank(), "requestId should not be blank");
                 });
     }
+
+    @Test
+    void shouldReturn409WhenBookAlreadyExists() {
+        var existingBookId = java.util.UUID.randomUUID();
+        doAnswer(invocation -> Mono.error(new ar.training.reactive.domain.exception.BookAlreadyExistsException(existingBookId)))
+                .when(createBookInboundPort)
+                .createBook(any(Book.class));
+
+        var createBookDto = CreateBookDtoFixture.withDefaults();
+        webTestClient.post()
+                .uri(BOOK_PATH)
+                .bodyValue(createBookDto)
+                .exchange()
+                .expectStatus().isEqualTo(org.springframework.http.HttpStatus.CONFLICT)
+                .expectBody(ProblemDetail.class)
+                .value(problemDetail -> {
+                    assertNotNull(problemDetail);
+                    assertEquals("Book already exists", problemDetail.getTitle());
+                    assertEquals(409, problemDetail.getStatus());
+                    assertEquals("Book with id " + existingBookId + " already exists", problemDetail.getDetail());
+                });
+    }
 }
