@@ -8,6 +8,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.r2dbc.core.DatabaseClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class DBConfigCommandLineRunner {
@@ -24,17 +26,26 @@ public class DBConfigCommandLineRunner {
     @Bean
     CommandLineRunner init() {
         return args -> {
-            createBookTable();
-            insertBooks();
+            try {
+                createBookTable()
+                        .then(Mono.defer(this::insertBooks))
+                        .block();
+                log.info("Database initialization completed successfully.");
+            } catch (Exception e) {
+                log.error("Database initialization failed.", e);
+                throw e;
+            }
         };
     }
 
-    private void insertBooks() {
-        BookDBData.ALL.forEach(this::upsertBook);
+    private Mono<Void> insertBooks() {
+        return Flux.fromIterable(BookDBData.ALL)
+                .flatMap(this::upsertBook)
+                .then();
     }
 
-    private void upsertBook(Book book) {
-        client.sql("""
+    private Mono<Void> upsertBook(Book book) {
+        return client.sql("""
                         INSERT INTO book (id, isbn, title)
                         VALUES (:id, :isbn, :title)
                         ON CONFLICT (id)
@@ -46,12 +57,11 @@ public class DBConfigCommandLineRunner {
                 .bind("title", book.getTitle())
                 .then()
                 .doOnSuccess(v -> log.info("'{}' inserted", book.getTitle()))
-                .doOnError(e -> log.error("Error inserting book", e))
-                .subscribe();
+                .doOnError(e -> log.error("Error inserting book", e));
     }
 
-    private void createBookTable() {
-        client.sql("""
+    private Mono<Void> createBookTable() {
+        return client.sql("""
             CREATE TABLE IF NOT EXISTS book (
                 id UUID PRIMARY KEY,
                 isbn VARCHAR(13) NOT NULL,
@@ -60,7 +70,6 @@ public class DBConfigCommandLineRunner {
         """)
                 .then()
                 .doOnSuccess(v -> log.info("Table 'book' verified/created."))
-                .doOnError(e -> log.error("Error creating table", e))
-                .subscribe();
+                .doOnError(e -> log.error("Error creating table", e));
     }
 }
