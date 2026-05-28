@@ -10,16 +10,16 @@ import reactor.core.publisher.Mono;
 @Service
 public class CreateBookUseCase implements CreateBookInboundPort {
 
-    private final BookRepositoryOutboundPort bookRepositoryOutboundPort;
+    private final BookRepositoryOutboundPort bookRepository;
 
-    public CreateBookUseCase(BookRepositoryOutboundPort bookRepositoryOutboundPort) {
-        this.bookRepositoryOutboundPort = bookRepositoryOutboundPort;
+    public CreateBookUseCase(BookRepositoryOutboundPort bookRepository) {
+        this.bookRepository = bookRepository;
     }
 
     public Mono<Book> createBook(Book book) {
-        return bookRepositoryOutboundPort.findById(book.getId())
+        return bookRepository.findById(book.getId())
                 .flatMap(transformer -> Mono.error(new BookAlreadyExistsException(book.getId())))
-                .then(bookRepositoryOutboundPort.save(book));
+                .then(bookRepository.save(book));
 
     }
 
