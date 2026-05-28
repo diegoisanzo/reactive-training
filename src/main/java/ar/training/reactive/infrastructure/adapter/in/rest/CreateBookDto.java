@@ -16,11 +16,4 @@ public record CreateBookDto(
     @Size(max = 255, message = "title must not exceed 255 characters")
     String title
 ) {
-
-    public static CreateBookDto of(Book book) {
-        return new CreateBookDto(
-            book.getIsbn(),
-            book.getTitle()
-        );
-    }
 }

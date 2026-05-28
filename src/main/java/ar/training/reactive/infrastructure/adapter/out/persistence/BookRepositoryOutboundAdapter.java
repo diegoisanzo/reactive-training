@@ -12,33 +12,38 @@ import java.util.UUID;
 public class BookRepositoryOutboundAdapter implements BookRepositoryOutboundPort {
 
     private final R2dbcBookRepository repository;
-    private final BookMapper mapper;
+    private final PersistenceBookMapper persistenceBookMapper;
+    private final PersistenceBookEntityMapper persistenceBookEntityMapper;
 
-    public BookRepositoryOutboundAdapter(R2dbcBookRepository repository, BookMapper mapper) {
+    public BookRepositoryOutboundAdapter(
+            R2dbcBookRepository repository,
+            PersistenceBookEntityMapper persistenceBookEntityMapper,
+            PersistenceBookMapper persistenceBookMapper) {
         this.repository = repository;
-        this.mapper = mapper;
+        this.persistenceBookEntityMapper = persistenceBookEntityMapper;
+        this.persistenceBookMapper = persistenceBookMapper;
     }
 
     @Override
     public Mono<Book> findById(UUID id) {
         return repository.findById(id)
-                .map(mapper::toBook);
+                .map(persistenceBookMapper::toBook);
     }
 
     @Override
     public Flux<Book> findAll() {
         return repository.findAll()
-                .map(mapper::toBook);
+                .map(persistenceBookMapper::toBook);
     }
 
     @Override
     public Mono<Book> save(Book book) {
-        return repository.save(mapper.toBookEntity(book))
-                .map(mapper::toBook);
+        return repository.save(persistenceBookEntityMapper.toBookEntity(book))
+                .map(persistenceBookMapper::toBook);
     }
 
     @Override
     public Mono<Void> delete(Book book) {
-        return repository.delete(mapper.toBookEntity(book));
+        return repository.delete(persistenceBookEntityMapper.toBookEntity(book));
     }
 }

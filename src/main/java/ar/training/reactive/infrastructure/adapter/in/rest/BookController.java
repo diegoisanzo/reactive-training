@@ -35,18 +35,21 @@ public class BookController {
     private final GetBookByIdInboundPort getBookByIdInboundPort;
     private final UpdateBookInboundPort updateBookInboundPort;
     private final DeleteBookByIdInboundPort deleteBookByIdInboundPort;
+    private final RestBookDtoMapper restBookDtoMapper;
     private final Logger logger;
 
     public BookController(CreateBookInboundPort createBookInboundPort,
                           GetAllBooksInboundPort getAllBooksInboundPort,
                           GetBookByIdInboundPort getBookByIdInboundPort,
                           UpdateBookInboundPort updateBookInboundPort,
-                          DeleteBookByIdInboundPort deleteBookByIdInboundPort) {
+                          DeleteBookByIdInboundPort deleteBookByIdInboundPort,
+                          RestBookDtoMapper restBookDtoMapper) {
         this.createBookInboundPort = createBookInboundPort;
         this.updateBookInboundPort = updateBookInboundPort;
         this.getAllBooksInboundPort = getAllBooksInboundPort;
         this.getBookByIdInboundPort = getBookByIdInboundPort;
         this.deleteBookByIdInboundPort = deleteBookByIdInboundPort;
+        this.restBookDtoMapper = restBookDtoMapper;
         this.logger = LoggerFactory.getLogger(getClass());
     }
 
@@ -57,7 +60,7 @@ public class BookController {
         logger.info("BookController::createBook()");
         var book = new Book(UUID.randomUUID(), createBookDto.isbn(), createBookDto.title());
         return createBookInboundPort.createBook(book)
-                .map(BookDto::of)
+                .map(restBookDtoMapper::toBookDto)
                 .map(ResponseEntity::ok);
     }
 
@@ -67,7 +70,7 @@ public class BookController {
     public Flux<BookDto> getAllBooks() {
         logger.info("BookController::getAllBooks()");
         return getAllBooksInboundPort.getAllBooks()
-                .map(BookDto::of);
+                .map(restBookDtoMapper::toBookDto);
     }
 
     @GetMapping(BOOK_BY_ID_PATH)
@@ -76,7 +79,7 @@ public class BookController {
     public Mono<ResponseEntity<BookDto>> getBookById(@PathVariable UUID id) {
         logger.info("BookController::getBookById({})", id);
         return getBookByIdInboundPort.getBookById(id)
-                .map(BookDto::of)
+                .map(restBookDtoMapper::toBookDto)
                 .map(ResponseEntity::ok);
     }
 
@@ -87,7 +90,7 @@ public class BookController {
         logger.info("BookController::updateBook({})", bookDto);
         var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title());
         return updateBookInboundPort.updateBook(book)
-                .map(BookDto::of)
+                .map(restBookDtoMapper::toBookDto)
                 .map(ResponseEntity::ok);
     }
 

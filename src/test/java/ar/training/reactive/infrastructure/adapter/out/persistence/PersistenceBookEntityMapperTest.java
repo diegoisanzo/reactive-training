@@ -10,32 +10,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class BookMapperTest {
+public class PersistenceBookEntityMapperTest {
 
-    private final BookMapper bookMapper;
+    private final PersistenceBookEntityMapper persistenceBookEntityMapper;
 
-    public BookMapperTest() {
-        this.bookMapper = Mappers.getMapper(BookMapper.class);
-    }
-
-    @Test
-    void mapsToBookOk() {
-        var bookEntity = BookEntityFixture.withDefaults();
-
-        var book = bookMapper.toBook(bookEntity);
-
-        assertNotNull(book);
-
-        assertEquals(bookEntity.getId(), book.getId());
-        assertEquals(bookEntity.getIsbn(), book.getIsbn());
-        assertEquals(bookEntity.getTitle(), book.getTitle());
+    public PersistenceBookEntityMapperTest() {
+        this.persistenceBookEntityMapper = Mappers.getMapper(PersistenceBookEntityMapper.class);
     }
 
     @Test
     void mapsToBookEntityOk() {
         var book = BookFixture.withDefaults();
 
-        var bookEntity = bookMapper.toBookEntity(book);
+        var bookEntity = persistenceBookEntityMapper.toBookEntity(book);
 
         assertNotNull(bookEntity);
 

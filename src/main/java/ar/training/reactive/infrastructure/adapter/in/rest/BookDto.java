@@ -1,6 +1,5 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
-import ar.training.reactive.domain.model.Book;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -21,12 +20,4 @@ public record BookDto(
     @Size(max = 255, message = "title must not exceed 255 characters")
     String title
 ) {
-
-    public static BookDto of(Book book) {
-        return new BookDto(
-            book.getId(),
-            book.getIsbn(),
-            book.getTitle()
-        );
-    }
 }
