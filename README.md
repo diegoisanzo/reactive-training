@@ -78,13 +78,13 @@ Resilience patterns are applied at the controller layer via Resilience4j annotat
 
 `@TimeLimiter` enforces a per-endpoint timeout on the reactive pipeline. If the operation exceeds the configured duration, the request fails with HTTP 500 (the default Spring WebFlux error response for a timeout signal propagated as an unhandled exception).
 
-| Endpoint          | Timeout |
-|-------------------|---------|
-| `POST /v1/books`  | 2s      |
-| `GET /v1/books`   | 3s      |
-| `GET /v1/books/{id}` | 1s   |
-| `PUT /v1/books`   | 2s      |
-| `DELETE /v1/books/{id}` | 1s |
+| HTTP Verb | Endpoint         | Timeout |
+|-----------|------------------|---------|
+| POST      | `/v1/books`      | 2s      |
+| GET       | `/v1/books`      | 3s      |
+| GET       | `/v1/books/{id}` | 1s      |
+| PUT       | `/v1/books`      | 2s      |
+| DELETE    | `/v1/books/{id}` | 1s      |
 
 ### Rate Limiter
 
