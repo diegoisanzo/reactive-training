@@ -9,11 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class RestPersistenceBookMapperTest {
+public class PersistenceBookMapperTest {
 
     private final PersistenceBookMapper persistenceBookMapper;
 
-    public RestPersistenceBookMapperTest() {
+    public PersistenceBookMapperTest() {
         this.persistenceBookMapper = Mappers.getMapper(PersistenceBookMapper.class);
     }
 
