@@ -3,7 +3,6 @@ package ar.training.reactive.infrastructure.adapter.out.persistence;
 import ar.training.reactive.domain.model.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +16,6 @@ public class DBConfigCommandLineRunner {
     private final Logger log;
     private final DatabaseClient client;
 
-    @Autowired
     public DBConfigCommandLineRunner(DatabaseClient client) {
         this.log = LoggerFactory.getLogger(getClass());
         this.client = client;
