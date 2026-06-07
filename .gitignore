@@ -38,6 +38,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### JVM ###
+*.hprof
+
 ### Antigravity CLI ###
 .antigravitycli/
 
