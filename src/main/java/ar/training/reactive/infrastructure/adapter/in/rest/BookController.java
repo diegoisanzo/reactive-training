@@ -58,7 +58,7 @@ public class BookController {
     @RateLimiter(name = "createBookRateLimit")
     public Mono<ResponseEntity<BookDto>> createBook(@Valid @RequestBody CreateBookDto createBookDto) {
         logger.info("BookController::createBook()");
-        var book = new Book(UUID.randomUUID(), createBookDto.isbn(), createBookDto.title(), createBookDto.availableCopies());
+        var book = new Book(UUID.randomUUID(), createBookDto.isbn(), createBookDto.title(), createBookDto.availableCopies(), createBookDto.genre());
         return createBookInboundPort.createBook(book)
                 .map(restBookDtoMapper::toBookDto)
                 .map(ResponseEntity::ok);
@@ -88,7 +88,7 @@ public class BookController {
     @RateLimiter(name = "updateBookRateLimit")
     public Mono<ResponseEntity<BookDto>> updateBook(@Valid @RequestBody BookDto bookDto) {
         logger.info("BookController::updateBook({})", bookDto);
-        var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title(), bookDto.availableCopies());
+        var book = new Book(bookDto.id(), bookDto.isbn(), bookDto.title(), bookDto.availableCopies(), bookDto.genre());
         return updateBookInboundPort.updateBook(book)
                 .map(restBookDtoMapper::toBookDto)
                 .map(ResponseEntity::ok);

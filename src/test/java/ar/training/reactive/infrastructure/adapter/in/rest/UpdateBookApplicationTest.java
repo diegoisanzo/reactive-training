@@ -3,6 +3,7 @@ package ar.training.reactive.infrastructure.adapter.in.rest;
 import ar.training.reactive.SharedContainers;
 import ar.training.reactive.application.port.in.UpdateBookInboundPort;
 import ar.training.reactive.domain.model.Book;
+import ar.training.reactive.domain.model.Genre;
 import ar.training.reactive.fixture.BookDtoFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn404WhenUpdatingNonExistentBook() {
-        var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown", 0);
+        var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown", 0, Genre.FICTION);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(nonExistent)
@@ -77,7 +78,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullId() {
-        var invalidDto = new BookDto(null, "9780000000000", "Valid Title", 0);
+        var invalidDto = new BookDto(null, "9780000000000", "Valid Title", 0, Genre.FICTION);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -88,7 +89,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullIsbn() {
-        var invalidDto = new BookDto(UUID.randomUUID(), null, "Valid Title", 0);
+        var invalidDto = new BookDto(UUID.randomUUID(), null, "Valid Title", 0, Genre.FICTION);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -99,7 +100,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithEmptyIsbn() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "", "Valid Title", 0);
+        var invalidDto = new BookDto(UUID.randomUUID(), "", "Valid Title", 0, Genre.FICTION);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -110,7 +111,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithIsbnExceedingMaxLength() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "12345678901234", "Valid Title", 0);
+        var invalidDto = new BookDto(UUID.randomUUID(), "12345678901234", "Valid Title", 0, Genre.FICTION);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -121,7 +122,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullTitle() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", null, 0);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", null, 0, Genre.FICTION);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -132,7 +133,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithEmptyTitle() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "", 0);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "", 0, Genre.FICTION);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -144,7 +145,7 @@ class UpdateBookApplicationTest {
     @Test
     void shouldReturn400WhenUpdatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(256);
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle, 0);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle, 0, Genre.FICTION);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)

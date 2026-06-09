@@ -3,6 +3,7 @@ package ar.training.reactive.infrastructure.adapter.in.rest;
 import ar.training.reactive.SharedContainers;
 import ar.training.reactive.application.port.in.CreateBookInboundPort;
 import ar.training.reactive.domain.model.Book;
+import ar.training.reactive.domain.model.Genre;
 import ar.training.reactive.fixture.CreateBookDtoFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithNullIsbn() {
-        var invalidDto = new CreateBookDto(null, "Valid Title", 0);
+        var invalidDto = new CreateBookDto(null, "Valid Title", 0, Genre.FICTION);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -87,7 +88,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyIsbn() {
-        var invalidDto = new CreateBookDto("", "Valid Title", 0);
+        var invalidDto = new CreateBookDto("", "Valid Title", 0, Genre.FICTION);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -98,7 +99,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithIsbnExceedingMaxLength() {
-        var invalidDto = new CreateBookDto("12345678901234", "Valid Title", 0);
+        var invalidDto = new CreateBookDto("12345678901234", "Valid Title", 0, Genre.FICTION);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -109,7 +110,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithNullTitle() {
-        var invalidDto = new CreateBookDto("9780000000000", null, 0);
+        var invalidDto = new CreateBookDto("9780000000000", null, 0, Genre.FICTION);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -120,7 +121,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyTitle() {
-        var invalidDto = new CreateBookDto("9780000000000", "", 0);
+        var invalidDto = new CreateBookDto("9780000000000", "", 0, Genre.FICTION);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -132,7 +133,7 @@ class CreateBookApplicationTest {
     @Test
     void shouldReturn400WhenCreatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(256);
-        var invalidDto = new CreateBookDto("9780000000000", longTitle, 0);
+        var invalidDto = new CreateBookDto("9780000000000", longTitle, 0, Genre.FICTION);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)

@@ -1,5 +1,6 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
+import ar.training.reactive.domain.model.Genre;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,9 @@ public record BookDto(
     String title,
 
     @Min(value = 0, message = "availableCopies must be zero or positive")
-    long availableCopies
+    long availableCopies,
+
+    @NotNull(message = "genre must not be null")
+    Genre genre
 ) {
 }

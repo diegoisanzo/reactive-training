@@ -16,6 +16,6 @@ public class BookFixture {
     }
 
     private static Book copy(Book b) {
-        return new Book(b.getId(), b.getIsbn(), b.getTitle(), b.getAvailableCopies());
+        return new Book(b.getId(), b.getIsbn(), b.getTitle(), b.getAvailableCopies(), b.getGenre());
     }
 }

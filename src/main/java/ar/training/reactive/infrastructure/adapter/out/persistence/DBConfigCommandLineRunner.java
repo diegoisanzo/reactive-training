@@ -44,17 +44,19 @@ public class DBConfigCommandLineRunner {
 
     private Mono<Void> upsertBook(Book book) {
         return client.sql("""
-                        INSERT INTO book (id, isbn, title, available_copies)
-                        VALUES (:id, :isbn, :title, :availableCopies)
+                        INSERT INTO book (id, isbn, title, available_copies, genre)
+                        VALUES (:id, :isbn, :title, :availableCopies, :genre)
                         ON CONFLICT (id)
                         DO UPDATE SET
                             isbn = EXCLUDED.isbn,
                             title = EXCLUDED.title,
-                            available_copies = EXCLUDED.available_copies;""")
+                            available_copies = EXCLUDED.available_copies,
+                            genre = EXCLUDED.genre;""")
                 .bind("id", book.getId())
                 .bind("isbn", book.getIsbn())
                 .bind("title", book.getTitle())
                 .bind("availableCopies", book.getAvailableCopies())
+                .bind("genre", book.getGenre().name())
                 .then()
                 .doOnSuccess(v -> log.info("'{}' inserted", book.getTitle()))
                 .doOnError(e -> log.error("Error inserting book", e));
@@ -66,7 +68,8 @@ public class DBConfigCommandLineRunner {
                 id UUID PRIMARY KEY,
                 isbn VARCHAR(13) NOT NULL,
                 title VARCHAR(255) NOT NULL,
-                available_copies BIGINT NOT NULL DEFAULT 0
+                available_copies BIGINT NOT NULL DEFAULT 0,
+                genre VARCHAR(50) NOT NULL
             );
         """)
                 .then()

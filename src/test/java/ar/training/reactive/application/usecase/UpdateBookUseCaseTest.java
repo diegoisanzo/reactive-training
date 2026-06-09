@@ -3,6 +3,7 @@ package ar.training.reactive.application.usecase;
 import ar.training.reactive.application.port.out.BookRepositoryOutboundPort;
 import ar.training.reactive.domain.exception.BookNotFoundException;
 import ar.training.reactive.domain.model.Book;
+import ar.training.reactive.domain.model.Genre;
 import ar.training.reactive.fixture.BookFixture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,7 @@ class UpdateBookUseCaseTest {
     @Test
     void shouldUpdateBookWhenExistsAndDataChanged() {
         var existingBook = BookFixture.withDefaults();
-        var incomingBook = new Book(existingBook.getId(), "9781234567890", "New Title", 15);
+        var incomingBook = new Book(existingBook.getId(), "9781234567890", "New Title", 15, Genre.NON_FICTION);
         
         when(bookRepositoryOutboundPort.findById(existingBook.getId())).thenReturn(Mono.just(existingBook));
         when(bookRepositoryOutboundPort.save(any(Book.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
@@ -49,7 +50,7 @@ class UpdateBookUseCaseTest {
     @Test
     void shouldNotSaveWhenDataHasNotChanged() {
         var existingBook = BookFixture.withDefaults();
-        var incomingBook = new Book(existingBook.getId(), existingBook.getIsbn(), existingBook.getTitle(), existingBook.getAvailableCopies());
+        var incomingBook = new Book(existingBook.getId(), existingBook.getIsbn(), existingBook.getTitle(), existingBook.getAvailableCopies(), existingBook.getGenre());
         
         when(bookRepositoryOutboundPort.findById(existingBook.getId())).thenReturn(Mono.just(existingBook));
 

@@ -1,5 +1,6 @@
 package ar.training.reactive.fixture;
 
+import ar.training.reactive.domain.model.Genre;
 import ar.training.reactive.infrastructure.adapter.in.rest.CreateBookDto;
 
 public class CreateBookDtoFixture {
@@ -8,6 +9,7 @@ public class CreateBookDtoFixture {
         return new CreateBookDto(
                 "1780132350888",
                 "NEW BOOK",
-                7);
+                7,
+                Genre.FICTION);
     }
 }
