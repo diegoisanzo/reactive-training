@@ -96,11 +96,26 @@ All endpoints share the same defaults: **100 requests / 1s** window.
 
 Requires PostgreSQL at `localhost:5432`, database `postgres`, user `postgres`, password `p`.
 
+Start the database with Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+Then run the application:
+
 ```bash
 ./gradlew bootRun
 ```
 
 The table schema and seed data are created at startup by `DBConfigCommandLineRunner` (no Flyway/Liquibase).
+
+To stop the database:
+
+```bash
+docker compose down        # keeps data
+docker compose down -v     # also removes the volume
+```
 
 ## Testing
 
