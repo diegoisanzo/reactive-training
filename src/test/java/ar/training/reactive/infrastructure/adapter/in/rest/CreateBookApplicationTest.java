@@ -71,7 +71,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithNullIsbn() {
-        var invalidDto = new CreateBookDto(null, "Valid Title");
+        var invalidDto = new CreateBookDto(null, "Valid Title", 0);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -87,7 +87,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyIsbn() {
-        var invalidDto = new CreateBookDto("", "Valid Title");
+        var invalidDto = new CreateBookDto("", "Valid Title", 0);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -98,7 +98,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithIsbnExceedingMaxLength() {
-        var invalidDto = new CreateBookDto("12345678901234", "Valid Title");
+        var invalidDto = new CreateBookDto("12345678901234", "Valid Title", 0);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -109,7 +109,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithNullTitle() {
-        var invalidDto = new CreateBookDto("9780000000000", null);
+        var invalidDto = new CreateBookDto("9780000000000", null, 0);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -120,7 +120,7 @@ class CreateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyTitle() {
-        var invalidDto = new CreateBookDto("9780000000000", "");
+        var invalidDto = new CreateBookDto("9780000000000", "", 0);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -132,7 +132,7 @@ class CreateBookApplicationTest {
     @Test
     void shouldReturn400WhenCreatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(256);
-        var invalidDto = new CreateBookDto("9780000000000", longTitle);
+        var invalidDto = new CreateBookDto("9780000000000", longTitle, 0);
         webTestClient.post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)

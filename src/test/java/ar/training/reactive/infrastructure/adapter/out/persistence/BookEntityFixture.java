@@ -9,7 +9,8 @@ public class BookEntityFixture {
 
         return new BookEntity(bookDto.id(),
                 bookDto.isbn(),
-                bookDto.title()
+                bookDto.title(),
+                bookDto.availableCopies()
         );
     }
 

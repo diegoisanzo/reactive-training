@@ -67,7 +67,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn404WhenUpdatingNonExistentBook() {
-        var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown");
+        var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown", 0);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(nonExistent)
@@ -77,7 +77,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullId() {
-        var invalidDto = new BookDto(null, "9780000000000", "Valid Title");
+        var invalidDto = new BookDto(null, "9780000000000", "Valid Title", 0);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -88,7 +88,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullIsbn() {
-        var invalidDto = new BookDto(UUID.randomUUID(), null, "Valid Title");
+        var invalidDto = new BookDto(UUID.randomUUID(), null, "Valid Title", 0);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -99,7 +99,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithEmptyIsbn() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "", "Valid Title");
+        var invalidDto = new BookDto(UUID.randomUUID(), "", "Valid Title", 0);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -110,7 +110,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithIsbnExceedingMaxLength() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "12345678901234", "Valid Title");
+        var invalidDto = new BookDto(UUID.randomUUID(), "12345678901234", "Valid Title", 0);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -121,7 +121,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullTitle() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", null);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", null, 0);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -132,7 +132,7 @@ class UpdateBookApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithEmptyTitle() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "");
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "", 0);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -144,7 +144,7 @@ class UpdateBookApplicationTest {
     @Test
     void shouldReturn400WhenUpdatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(256);
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle, 0);
         webTestClient.put()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)

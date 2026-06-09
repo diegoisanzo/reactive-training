@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +29,7 @@ class UpdateBookUseCaseTest {
     @Test
     void shouldUpdateBookWhenExistsAndDataChanged() {
         var existingBook = BookFixture.withDefaults();
-        var incomingBook = new Book(existingBook.getId(), "9781234567890", "New Title");
+        var incomingBook = new Book(existingBook.getId(), "9781234567890", "New Title", 15);
         
         when(bookRepositoryOutboundPort.findById(existingBook.getId())).thenReturn(Mono.just(existingBook));
         when(bookRepositoryOutboundPort.save(any(Book.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
@@ -48,7 +49,7 @@ class UpdateBookUseCaseTest {
     @Test
     void shouldNotSaveWhenDataHasNotChanged() {
         var existingBook = BookFixture.withDefaults();
-        var incomingBook = new Book(existingBook.getId(), existingBook.getIsbn(), existingBook.getTitle());
+        var incomingBook = new Book(existingBook.getId(), existingBook.getIsbn(), existingBook.getTitle(), existingBook.getAvailableCopies());
         
         when(bookRepositoryOutboundPort.findById(existingBook.getId())).thenReturn(Mono.just(existingBook));
 
@@ -57,7 +58,7 @@ class UpdateBookUseCaseTest {
                 .verifyComplete();
 
         verify(bookRepositoryOutboundPort).findById(existingBook.getId());
-        verify(bookRepositoryOutboundPort, org.mockito.Mockito.never()).save(any(Book.class));
+        verify(bookRepositoryOutboundPort, never()).save(any(Book.class));
     }
 
     @Test

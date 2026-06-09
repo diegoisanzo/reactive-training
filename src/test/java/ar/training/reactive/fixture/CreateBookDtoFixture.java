@@ -7,6 +7,7 @@ public class CreateBookDtoFixture {
     public static CreateBookDto withDefaults() {
         return new CreateBookDto(
                 "1780132350888",
-                "NEW BOOK");
+                "NEW BOOK",
+                7);
     }
 }

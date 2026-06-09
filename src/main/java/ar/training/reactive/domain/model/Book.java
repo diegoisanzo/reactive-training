@@ -8,11 +8,13 @@ public final class Book {
     private UUID id;
     private String isbn;
     private String title;
+    private long availableCopies;
 
-    public Book(UUID id, String isbn, String title) {
+    public Book(UUID id, String isbn, String title, long availableCopies) {
         this.id = id;
         this.isbn = isbn;
         this.title = title;
+        this.availableCopies = availableCopies;
     }
 
     public boolean updateFrom(Book other) {
@@ -25,15 +27,21 @@ public final class Book {
             setTitle(other.getTitle());
             dirty = true;
         }
+        if (getAvailableCopies() != other.getAvailableCopies()) {
+            setAvailableCopies(other.getAvailableCopies());
+            dirty = true;
+        }
         return dirty;
     }
 
     public UUID getId() { return id; }
     public String getIsbn() { return isbn; }
     public String getTitle() { return title; }
+    public long getAvailableCopies() { return availableCopies; }
     public void setId(UUID id) { this.id = id; }
     public void setIsbn(String isbn) { this.isbn = isbn; }
     public void setTitle(String title) { this.title = title; }
+    public void setAvailableCopies(long availableCopies) { this.availableCopies = availableCopies; }
 
     @Override
     public boolean equals(Object obj) {
@@ -50,6 +58,6 @@ public final class Book {
 
     @Override
     public String toString() {
-        return "Book[id=" + id + ", isbn=" + isbn + ", title=" + title + ']';
+        return "Book[id=" + id + ", isbn=" + isbn + ", title=" + title + ", availableCopies=" + availableCopies + ']';
     }
 }

@@ -18,6 +18,7 @@ public class BookDtoFixture {
         return new BookDto(
                 withDefaults().id(),
                 "9780132350888",
-                "Clean Code: Updated");
+                "Clean Code: Updated",
+                20);
     }
 }

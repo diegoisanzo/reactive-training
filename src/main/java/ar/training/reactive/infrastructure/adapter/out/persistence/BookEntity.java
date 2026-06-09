@@ -19,16 +19,22 @@ public class BookEntity {
     @Column("title")
     private String title;
 
-    public BookEntity(UUID id, String isbn, String title) {
+    @Column("available_copies")
+    private long availableCopies;
+
+    public BookEntity(UUID id, String isbn, String title, long availableCopies) {
         this.id = id;
         this.isbn = isbn;
         this.title = title;
+        this.availableCopies = availableCopies;
     }
 
     public UUID getId() { return id; }
     public String getIsbn() { return isbn; }
     public String getTitle() { return title; }
+    public long getAvailableCopies() { return availableCopies; }
     public void setId(UUID id) { this.id = id; }
     public void setIsbn(String isbn) { this.isbn = isbn; }
     public void setTitle(String title) { this.title = title; }
+    public void setAvailableCopies(long availableCopies) { this.availableCopies = availableCopies; }
 }
