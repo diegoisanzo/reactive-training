@@ -4,8 +4,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 public class SharedContainers {
-
     @ServiceConnection
     static final PostgreSQLContainer postgresSQLContainer =
-            new PostgreSQLContainer("postgres:16-alpine");
+            new PostgreSQLContainer("postgres:17-alpine");
 }
