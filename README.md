@@ -104,7 +104,7 @@ docker compose up -d
 
 Then run the application:
 
-```bash
+```bashh
 ./gradlew bootRun
 ```
 
@@ -127,4 +127,4 @@ docker compose down -v     # also removes the volume
 ./gradlew test --tests "ar.training.reactive.infrastructure.adapter.in.rest.GetAllBooksApplicationTest"
 ```
 
-Integration tests use Testcontainers (`postgres:16-alpine`). No mocks — all tests hit a real database.
+Integration tests use Testcontainers (`postgres:17-alpine`). No mocks — all tests hit a real database.
