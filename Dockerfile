@@ -8,7 +8,7 @@ COPY gradle gradle
 COPY build.gradle settings.gradle ./
 
 # Descargar dependencias básicas antes de copiar el código fuente
-RUN ./gradlew dependencies --no-daemon || true
+RUN ./gradlew dependencies --no-daemon
 
 # Copiar el código fuente y empaquetar la aplicación
 COPY src src
@@ -19,6 +19,8 @@ FROM ubuntu/jre:25-26.04_edge
 WORKDIR /app
 
 # Copiar el Fat JAR compilado por Gradle
+EXPOSE 8080
+
 COPY --from=build /app/build/libs/*.jar app.jar
 
 # Ejecución directa (sintaxis de array estricta por la falta de shell)
