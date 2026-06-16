@@ -41,10 +41,8 @@ dependencies {
 
 	// Migration tool driver (Optional, only if using Flyway/Liquibase)
 	runtimeOnly 'org.postgresql:r2dbc-postgresql'
-	testRuntimeOnly 'org.postgresql:r2dbc-postgresql'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-webflux-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-r2dbc-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-r2dbc-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 	testImplementation 'org.springframework.security:spring-security-test'
