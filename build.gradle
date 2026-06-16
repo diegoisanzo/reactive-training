@@ -32,7 +32,7 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
 	implementation 'io.github.resilience4j:resilience4j-spring-boot4:2.4.0'
     implementation 'io.github.resilience4j:resilience4j-reactor:2.4.0'
-	implementation 'org.springframework.boot:spring-boot-starter-aop:4.0.0-M2'
+	implementation 'org.springframework.boot:spring-boot-starter-aspectj'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
