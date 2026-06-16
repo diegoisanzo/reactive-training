@@ -1,8 +1,12 @@
+jwt:
+  secret: ${JWT_SECRET:reactive-training-jwt-secret-key-must-be-long-enough-for-hs256-algorithm}
+  expiration-ms: 86400000
+
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: p
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/postgres}
+    username: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:p}
   application:
     name: reactive-training
 

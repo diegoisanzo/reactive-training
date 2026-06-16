@@ -27,8 +27,8 @@ import java.util.UUID;
 @RestController
 public class BookController {
 
-    static final String BOOK_PATH = "/v1/books";
-    static final String BOOK_BY_ID_PATH = BOOK_PATH + "/{id}";
+    public static final String BOOK_PATH = "/v1/books";
+    public static final String BOOK_BY_ID_PATH = BOOK_PATH + "/{id}";
 
     private final CreateBookInboundPort createBookInboundPort;
     private final GetAllBooksInboundPort getAllBooksInboundPort;

@@ -3,7 +3,7 @@ package ar.training.reactive.infrastructure.adapter.in.rest;
 import ar.training.reactive.SharedContainers;
 import ar.training.reactive.application.port.in.DeleteBookByIdInboundPort;
 import ar.training.reactive.fixture.BookDtoFixture;
-import org.junit.jupiter.api.BeforeEach;
+import ar.training.reactive.infrastructure.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,12 +19,6 @@ import java.util.UUID;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_BY_ID_PATH;
 import static java.time.temporal.ChronoUnit.MILLIS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -32,74 +26,40 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
-class DeleteBookApplicationTest {
+class DeleteBookApplicationTest extends BaseApplicationTest {
 
-    private final WebTestClient webTestClient;
-    private final TestDataSetup testDataSetup;
     @MockitoSpyBean
     private DeleteBookByIdInboundPort deleteBookByIdInboundPort;
 
     @Autowired
-    DeleteBookApplicationTest(
-            WebTestClient webTestClient,
-            TestDataSetup testDataSetup) {
-        this.webTestClient = webTestClient;
-        this.testDataSetup = testDataSetup;
-    }
-
-    @BeforeEach
-    void beforeEach() {
-        testDataSetup.refresh();
+    DeleteBookApplicationTest(WebTestClient webTestClient, TestDataSetup testDataSetup, JwtService jwtService) {
+        super(webTestClient, testDataSetup, jwtService);
     }
 
     @Test
     void shouldDeleteBook() {
         var id = BookDtoFixture.withDefaults().id();
-        webTestClient.delete()
-                .uri(BOOK_BY_ID_PATH, id)
-                .exchange()
+        authedAdminUserClient().delete().uri(BOOK_BY_ID_PATH, id).exchange()
                 .expectStatus().isNoContent();
     }
 
     @Test
     void shouldReturn404WhenDeletingNonExistentBook() {
-        webTestClient.delete()
-                .uri(BOOK_BY_ID_PATH, UUID.randomUUID())
-                .exchange()
+        authedAdminUserClient().delete().uri(BOOK_BY_ID_PATH, UUID.randomUUID()).exchange()
                 .expectStatus().isNotFound();
     }
 
     @Test
     void shouldFailToDeleteBookWhenExceedingTimeLimit() {
         var id = BookDtoFixture.withDefaults().id();
-        doAnswer(_ -> Mono
-                .delay(Duration.of(1200, MILLIS))
-                .then(Mono.empty())
-        )
+        doAnswer(_ -> Mono.delay(Duration.of(1200, MILLIS)).then(Mono.empty()))
             .when(deleteBookByIdInboundPort)
             .deleteBookById(any(UUID.class));
-        webTestClient.delete()
+        authedAdminUserClient().delete()
                 .uri(BOOK_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody(ProblemDetail.class)
-                .value(problemDetail -> {
-                    assertNotNull(problemDetail);
-                    assertNull(problemDetail.getType());
-                    assertEquals("Internal Server Error", problemDetail.getTitle());
-                    assertEquals(500, problemDetail.getStatus());
-                    assertNull(problemDetail.getDetail());
-                    assertNull(problemDetail.getInstance());
-                    var properties = problemDetail.getProperties();
-                    assertNotNull(properties);
-                    assertEquals("/v1/books/" + id, properties.get("path"));
-                    assertEquals("Internal Server Error", properties.get("error"));
-                    assertNotNull(properties.get("timestamp"));
-                    assertTrue(properties.containsKey("requestId"), "Should contain requestId key");
-                    var requestIdValue = properties.get("requestId");
-                    assertNotNull(requestIdValue, "requestId value should not be null");
-                    assertInstanceOf(String.class, requestIdValue, "requestId should be a String");
-                    assertFalse(((String) requestIdValue).isBlank(), "requestId should not be blank");
-                });
+                .value(pd -> assertInternalServerError(pd, "/v1/books/" + id));
     }
 }

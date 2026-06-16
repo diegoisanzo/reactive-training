@@ -3,7 +3,7 @@ package ar.training.reactive.infrastructure.adapter.in.rest;
 import ar.training.reactive.SharedContainers;
 import ar.training.reactive.fixture.BookDtoFixture;
 import ar.training.reactive.fixture.CreateBookDtoFixture;
-import org.junit.jupiter.api.BeforeEach;
+import ar.training.reactive.infrastructure.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,61 +28,48 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 })
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
-class RateLimiterApplicationTest {
-
-    private final WebTestClient webTestClient;
-    private final TestDataSetup testDataSetup;
+class RateLimiterApplicationTest extends BaseApplicationTest {
 
     @Autowired
-    RateLimiterApplicationTest(WebTestClient webTestClient, TestDataSetup testDataSetup) {
-        this.webTestClient = webTestClient;
-        this.testDataSetup = testDataSetup;
-    }
-
-    @BeforeEach
-    void beforeEach() {
-        testDataSetup.refresh();
+    RateLimiterApplicationTest(WebTestClient webTestClient, TestDataSetup testDataSetup, JwtService jwtService) {
+        super(webTestClient, testDataSetup, jwtService);
     }
 
     @Test
     void shouldReturn429ForGetAllBooksWhenRateLimitExceeded() {
-        var getAllBooksRequest = webTestClient.get().uri(BOOK_PATH);
-        getAllBooksRequest.exchange().expectStatus().isOk();
-        assertIsStatus429AndRateLimitExceeded(getAllBooksRequest.exchange());
+        var request = authedReadUserClient().get().uri(BOOK_PATH);
+        request.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForGetBookByIdWhenRateLimitExceeded() {
         var id = BookDtoFixture.withDefaults().id();
-        var getBookByIdRequest = webTestClient.get().uri(BOOK_BY_ID_PATH, id);
-        getBookByIdRequest.exchange().expectStatus().isOk();
-        assertIsStatus429AndRateLimitExceeded(getBookByIdRequest.exchange());
+        var request = authedReadUserClient().get().uri(BOOK_BY_ID_PATH, id);
+        request.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForCreateBookWhenRateLimitExceeded() {
-        var createBookDto = CreateBookDtoFixture.withDefaults();
-        var createBookRequest = webTestClient.post().uri(BOOK_PATH).bodyValue(createBookDto);
-        createBookRequest.exchange().expectStatus().isOk();
-        assertIsStatus429AndRateLimitExceeded(createBookRequest.exchange());
+        var request = authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(CreateBookDtoFixture.withDefaults());
+        request.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForUpdateBookWhenRateLimitExceeded() {
-        var bookDto = BookDtoFixture.withUpdatesToDefault();
-        var updateBookRequest = webTestClient.put().uri(BOOK_PATH).bodyValue(bookDto);
-        updateBookRequest.exchange().expectStatus().isOk();
-        assertIsStatus429AndRateLimitExceeded(updateBookRequest.exchange());
+        var request = authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(BookDtoFixture.withUpdatesToDefault());
+        request.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForDeleteBookWhenRateLimitExceeded() {
         var id = BookDtoFixture.withDefaults().id();
-        var deleteBookByIdRequest = webTestClient.delete().uri(BOOK_BY_ID_PATH, id);
-
-        deleteBookByIdRequest.exchange().expectStatus().isNoContent();
-
-        assertIsStatus429AndRateLimitExceeded(deleteBookByIdRequest.exchange());
+        var request = authedAdminUserClient().delete().uri(BOOK_BY_ID_PATH, id);
+        request.exchange().expectStatus().isNoContent();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     private static void assertIsStatus429AndRateLimitExceeded(WebTestClient.ResponseSpec response) {

@@ -5,6 +5,7 @@ Spring Boot 4 + WebFlux reactive REST API backed by PostgreSQL via R2DBC. Java 2
 ## Stack
 
 - Spring Boot 4 / WebFlux (non-blocking, reactive)
+- Spring Security + JWT (stateless authentication)
 - R2DBC + PostgreSQL
 - Testcontainers (integration tests)
 
@@ -51,9 +52,10 @@ Adapters that connect the application to the outside world:
 ```
 infrastructure/
   adapter/
-    in/rest/        — BookController, BookDto, CreateBookDto, ExceptionsHandler
+    in/rest/        — AuthController, BookController, DTOs, ExceptionsHandler
     out/persistence/ — BookRepositoryOutboundAdapter, BookEntity, BookMapper,
                        R2dbcBookRepository, DBConfigCommandLineRunner
+  security/         — JwtService, JwtAuthenticationWebFilter, SecurityConfig, Role
 ```
 
 ### Request flow
@@ -69,6 +71,45 @@ HTTP request
 ```
 
 The controller depends on inbound port interfaces, not concrete use case classes. Swapping an implementation requires no change to the controller.
+
+## Security
+
+Authentication is stateless JWT-based. There is no session — the server issues a token on login and validates it on every subsequent request via a custom `JwtAuthenticationWebFilter`.
+
+### Login
+
+```
+POST /auth/login
+Content-Type: application/json
+
+{ "username": "admin-user", "password": "password" }
+```
+
+Returns `{ "token": "<jwt>" }`. Include the token in subsequent requests:
+
+```
+Authorization: Bearer <jwt>
+```
+
+### Roles
+
+Roles are defined in the `Role` enum (`READ`, `WRITE`, `ADMIN`). Access rules per endpoint:
+
+| HTTP Verb | Endpoint         | Required role |
+|-----------|------------------|---------------|
+| GET       | `/v1/books`      | READ          |
+| GET       | `/v1/books/{id}` | READ          |
+| POST      | `/v1/books`      | WRITE         |
+| PUT       | `/v1/books`      | WRITE         |
+| DELETE    | `/v1/books/{id}` | ADMIN         |
+
+In-memory users for local development:
+
+| Username         | Password   | Roles              |
+|------------------|------------|--------------------|
+| `read-user`      | `password` | READ               |
+| `read-write-user`| `password` | READ, WRITE        |
+| `admin-user`     | `password` | READ, WRITE, ADMIN |
 
 ## Resilience
 
@@ -94,28 +135,38 @@ All endpoints share the same defaults: **100 requests / 1s** window.
 
 ## Running
 
-Requires PostgreSQL at `localhost:5432`, database `postgres`, user `postgres`, password `p`.
+### Full stack with Docker Compose
 
-Start the database with Docker Compose:
+Builds the app image and starts both the app and PostgreSQL:
 
 ```bash
-docker compose up -d
+docker compose up --build
 ```
 
-Then run the application:
+The API will be available at `http://localhost:8080`.
 
-```bashh
-./gradlew bootRun
-```
-
-The table schema and seed data are created at startup by `DBConfigCommandLineRunner` (no Flyway/Liquibase).
-
-To stop the database:
+To stop:
 
 ```bash
 docker compose down        # keeps data
 docker compose down -v     # also removes the volume
 ```
+
+### Local development
+
+Start only the database:
+
+```bash
+docker compose up -d postgres
+```
+
+Then run the application:
+
+```bash
+./gradlew bootRun
+```
+
+The table schema and seed data are created at startup by `DBConfigCommandLineRunner` (no Flyway/Liquibase).
 
 ## Testing
 
