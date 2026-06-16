@@ -1,26 +1,26 @@
-# Etapa 1: Construcción (Compilación con Gradle 9.4.1 y JDK 25)
+# Stage 1: Build (Gradle 9.4.1 + JDK 25)
 FROM gradle:9.4.1-jdk25 AS build
 WORKDIR /app
 
-# Copiar archivos de configuración de Gradle para la caché de capas de Docker
+# Copy Gradle config files first for Docker layer caching
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle settings.gradle ./
 
-# Descargar dependencias básicas antes de copiar el código fuente
+# Download dependencies before copying source
 RUN ./gradlew dependencies --no-daemon
 
-# Copiar el código fuente y empaquetar la aplicación
+# Copy source and package the application
 COPY src src
 RUN ./gradlew bootJar --no-daemon
 
-# Etapa 2: Producción (Entorno de ejecución mínimo con Chisel para Java 25)
+# Stage 2: Runtime (minimal JRE via Chisel for Java 25)
 FROM ubuntu/jre:25-26.04_edge
 WORKDIR /app
 EXPOSE 8080
 
-# Copiar el Fat JAR compilado por Gradle
+# Copy the fat JAR built by Gradle
 COPY --from=build /app/build/libs/*.jar app.jar
 
-# Ejecución directa (sintaxis de array estricta por la falta de shell)
+# Exec form required — no shell available in this image
 ENTRYPOINT ["java", "-jar", "app.jar"]
