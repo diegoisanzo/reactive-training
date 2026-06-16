@@ -15,12 +15,11 @@ COPY src src
 RUN ./gradlew bootJar --no-daemon
 
 # Etapa 2: Producción (Entorno de ejecución mínimo con Chisel para Java 25)
-FROM ubuntu/jre:25-26.04_edge 
+FROM ubuntu/jre:25-26.04_edge
 WORKDIR /app
-
-# Copiar el Fat JAR compilado por Gradle
 EXPOSE 8080
 
+# Copiar el Fat JAR compilado por Gradle
 COPY --from=build /app/build/libs/*.jar app.jar
 
 # Ejecución directa (sintaxis de array estricta por la falta de shell)
