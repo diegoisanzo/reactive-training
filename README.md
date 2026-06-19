@@ -53,8 +53,8 @@ Adapters that connect the application to the outside world:
 infrastructure/
   adapter/
     in/rest/        — AuthController, BookController, DTOs, ExceptionsHandler
-    out/persistence/ — BookRepositoryOutboundAdapter, BookEntity, BookMapper,
-                       R2dbcBookRepository, DBConfigCommandLineRunner
+    out/persistence/ — BookRepositoryOutboundAdapter, BookEntity, PersistenceBookMapper,
+                       PersistenceBookEntityMapper, R2dbcBookRepository, DBConfigCommandLineRunner
   security/         — JwtService, JwtAuthenticationWebFilter, SecurityConfig, Role
 ```
 
@@ -144,6 +144,12 @@ docker compose up --build
 ```
 
 The API will be available at `http://localhost:8080`.
+
+To build just the app image manually, with the same name Compose would use:
+
+```bash
+docker build -t reactive-training-app -f Dockerfile .
+```
 
 To stop:
 
