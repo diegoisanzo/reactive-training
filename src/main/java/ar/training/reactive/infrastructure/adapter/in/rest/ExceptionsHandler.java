@@ -58,8 +58,8 @@ public class ExceptionsHandler {
         var fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> Map.of(
                         "field", error.getField(),
-                        "rejectedValue", error.getRejectedValue(),
-                        "message", error.getDefaultMessage()
+                        "rejectedValue", nullToLiteralString(error.getRejectedValue()),
+                        "message", nullToLiteralString(error.getDefaultMessage())
                 ))
                 .toList();
 
@@ -70,5 +70,12 @@ public class ExceptionsHandler {
         problemDetail.setProperty("fieldErrors", fieldErrors);
 
         return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    private static Object nullToLiteralString(Object value) {
+        if (value == null) {
+            return "null";
+        }
+        return value;
     }
 }
