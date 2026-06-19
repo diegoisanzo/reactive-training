@@ -40,13 +40,14 @@ class DeleteBookByIdUseCaseTest {
 
     @Test
     void shouldThrowExceptionWhenBookDoesNotExist() {
-        var id = UUID.randomUUID();
-        when(bookRepositoryOutboundPort.findById(id)).thenReturn(Mono.empty());
+        var id0 = new UUID(0, 0);
 
-        StepVerifier.create(deleteBookByIdUseCase.deleteBookById(id))
+        when(bookRepositoryOutboundPort.findById(id0)).thenReturn(Mono.empty());
+
+        StepVerifier.create(deleteBookByIdUseCase.deleteBookById(id0))
                 .expectError(BookNotFoundException.class)
                 .verify();
 
-        verify(bookRepositoryOutboundPort).findById(id);
+        verify(bookRepositoryOutboundPort).findById(id0);
     }
 }
