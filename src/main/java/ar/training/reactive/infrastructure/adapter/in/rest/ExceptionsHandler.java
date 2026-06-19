@@ -13,6 +13,7 @@ import org.springframework.web.server.ServerWebExchange;
 import java.net.URI;
 import java.util.Map;
 
+import static ar.training.reactive.infrastructure.adapter.in.rest.ExceptionsHandler.ExceptionHandlerUtils.nullToLiteralString;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -72,10 +73,13 @@ public class ExceptionsHandler {
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
-    private static Object nullToLiteralString(Object value) {
-        if (value == null) {
-            return "null";
+    static class ExceptionHandlerUtils {
+
+        static Object nullToLiteralString(Object value) {
+            if (value == null) {
+                return "null";
+            }
+            return value;
         }
-        return value;
     }
 }
