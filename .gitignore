@@ -1,20 +1,34 @@
 HELP.md
 
 ### AI Assistants ###
-CLAUDE.md              # Claude Code (Anthropic) — root instructions file
-.claude                # Claude Code configuration directory
-GEMINI.md              # Gemini Code Assist (Google)
-AGENTS.md              # OpenAI Codex / agents
-DEVIN.md               # Devin (Cognition AI)
-WINDSURF.md            # Windsurf (ex-Codeium)
-GROK.md                # Grok (xAI)
-CURSOR.md              # Cursor IDE — alternative root format
-.cursorrules           # Cursor IDE — legacy format
-.cursor/               # Cursor IDE — rules directory (.cursor/rules/*.mdc)
-COPILOT.md             # GitHub Copilot — alternative root format
-.github/copilot-instructions.md  # GitHub Copilot — official format
-CODY.md                # Sourcegraph Cody
-QODO.md                # Qodo (ex-CodiumAI)
+# CLAUDE.md            Claude Code (Anthropic) — root instructions file
+CLAUDE.md
+# .claude               Claude Code configuration directory
+.claude
+# GEMINI.md             Gemini Code Assist (Google)
+GEMINI.md
+# AGENTS.md             OpenAI Codex / agents
+AGENTS.md
+# DEVIN.md              Devin (Cognition AI)
+DEVIN.md
+# WINDSURF.md           Windsurf (ex-Codeium)
+WINDSURF.md
+# GROK.md               Grok (xAI)
+GROK.md
+# CURSOR.md             Cursor IDE — alternative root format
+CURSOR.md
+# .cursorrules          Cursor IDE — legacy format
+.cursorrules
+# .cursor/              Cursor IDE — rules directory (.cursor/rules/*.mdc)
+.cursor/
+# COPILOT.md            GitHub Copilot — alternative root format
+COPILOT.md
+# .github/copilot-instructions.md   GitHub Copilot — official format
+.github/copilot-instructions.md
+# CODY.md               Sourcegraph Cody
+CODY.md
+# QODO.md               Qodo (ex-CodiumAI)
+QODO.md
 
 .gradle
 build/
