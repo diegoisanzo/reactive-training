@@ -1,7 +1,7 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
-import ar.training.reactive.domain.exception.BookAlreadyExistsException;
-import ar.training.reactive.domain.exception.BookNotFoundException;
+import ar.training.reactive.domain.exception.book.BookAlreadyExistsException;
+import ar.training.reactive.domain.exception.book.BookNotFoundException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +14,7 @@ import java.net.URI;
 import java.util.Map;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.ExceptionsHandler.ExceptionHandlerUtils.nullToLiteralString;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.ProblemDetail.forStatus;
 
 @RestControllerAdvice

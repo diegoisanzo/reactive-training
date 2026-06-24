@@ -1,6 +1,6 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
-import ar.training.reactive.fixture.BookFixture;
+import ar.training.reactive.fixture.book.BookFixture;
 import ar.training.reactive.infrastructure.adapter.out.persistence.R2dbcBookRepository;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Component;

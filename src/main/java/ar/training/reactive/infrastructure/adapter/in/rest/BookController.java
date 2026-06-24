@@ -1,10 +1,10 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
-import ar.training.reactive.application.port.in.CreateBookInboundPort;
-import ar.training.reactive.application.port.in.DeleteBookByIdInboundPort;
-import ar.training.reactive.application.port.in.GetAllBooksInboundPort;
-import ar.training.reactive.application.port.in.GetBookByIdInboundPort;
-import ar.training.reactive.application.port.in.UpdateBookInboundPort;
+import ar.training.reactive.application.port.in.book.CreateBookInboundPort;
+import ar.training.reactive.application.port.in.book.DeleteBookByIdInboundPort;
+import ar.training.reactive.application.port.in.book.GetAllBooksInboundPort;
+import ar.training.reactive.application.port.in.book.GetBookByIdInboundPort;
+import ar.training.reactive.application.port.in.book.UpdateBookInboundPort;
 import ar.training.reactive.domain.model.Book;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;

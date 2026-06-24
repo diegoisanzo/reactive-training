@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.UUID;
 
 @Table("book")
-public class BookEntity {
+public class BookEntity extends BaseEntity<UUID> {
 
     @Id
     @Column("id")
@@ -34,6 +34,7 @@ public class BookEntity {
         this.genre = genre;
     }
 
+    @Override
     public UUID getId() { return id; }
     public String getIsbn() { return isbn; }
     public String getTitle() { return title; }

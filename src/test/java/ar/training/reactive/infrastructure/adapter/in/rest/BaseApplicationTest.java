@@ -11,13 +11,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-abstract class BaseApplicationTest {
+public abstract class BaseApplicationTest {
 
     protected final WebTestClient webTestClient;
     protected final TestDataSetup testDataSetup;
     protected final JwtService jwtService;
 
-    BaseApplicationTest(WebTestClient webTestClient, TestDataSetup testDataSetup, JwtService jwtService) {
+    public BaseApplicationTest(WebTestClient webTestClient, TestDataSetup testDataSetup, JwtService jwtService) {
         this.webTestClient = webTestClient;
         this.testDataSetup = testDataSetup;
         this.jwtService = jwtService;

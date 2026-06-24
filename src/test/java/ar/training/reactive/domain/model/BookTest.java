@@ -1,6 +1,6 @@
 package ar.training.reactive.domain.model;
 
-import ar.training.reactive.fixture.BookFixture;
+import ar.training.reactive.fixture.book.BookFixture;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
