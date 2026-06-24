@@ -7,7 +7,7 @@ import java.util.UUID;
 public class BookAlreadyExistsException extends AlreadyExistsException {
 
     public BookAlreadyExistsException(UUID id) {
-        super("Book with id " + id + " already exists", id);
+        super("Book with id " + id + " already exists", id, "Book already exists");
     }
 
 }
