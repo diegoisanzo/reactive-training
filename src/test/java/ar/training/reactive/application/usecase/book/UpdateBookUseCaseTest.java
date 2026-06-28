@@ -30,7 +30,7 @@ class UpdateBookUseCaseTest {
     @Test
     void shouldUpdateBookWhenExistsAndDataChanged() {
         var existingBook = BookFixture.withDefaults();
-        var incomingBook = new Book(existingBook.getId(), "9781234567890", "New Title", 15, Genre.NON_FICTION);
+        var incomingBook = new Book(existingBook.getId(), "9781234567890", "New Title", 15, Genre.NON_FICTION, existingBook.getAuthorId());
         
         when(bookRepositoryOutboundPort.findById(existingBook.getId())).thenReturn(Mono.just(existingBook));
         when(bookRepositoryOutboundPort.save(any(Book.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
@@ -50,7 +50,7 @@ class UpdateBookUseCaseTest {
     @Test
     void shouldNotSaveWhenDataHasNotChanged() {
         var existingBook = BookFixture.withDefaults();
-        var incomingBook = new Book(existingBook.getId(), existingBook.getIsbn(), existingBook.getTitle(), existingBook.getAvailableCopies(), existingBook.getGenre());
+        var incomingBook = new Book(existingBook.getId(), existingBook.getIsbn(), existingBook.getTitle(), existingBook.getAvailableCopies(), existingBook.getGenre(), existingBook.getAuthorId());
         
         when(bookRepositoryOutboundPort.findById(existingBook.getId())).thenReturn(Mono.just(existingBook));
 

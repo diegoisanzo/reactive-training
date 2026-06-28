@@ -6,8 +6,8 @@ import ar.training.reactive.domain.model.Book;
 import ar.training.reactive.domain.model.Genre;
 import ar.training.reactive.fixture.book.BookDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
-import ar.training.reactive.infrastructure.adapter.in.rest.BookDto;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
+import ar.training.reactive.infrastructure.adapter.out.persistence.author.AuthorDBData;
 import ar.training.reactive.infrastructure.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.UUID;
 
-import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_PATH;
+import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_PATH;
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -32,6 +32,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
 class UpdateBookApplicationTest extends BaseApplicationTest {
+
+    private static final UUID AUTHOR_ID = AuthorDBData.ALL.getFirst().getId();
 
     @MockitoSpyBean
     private UpdateBookInboundPort updateBookInboundPort;
@@ -55,49 +57,49 @@ class UpdateBookApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturn404WhenUpdatingNonExistentBook() {
-        var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown", 0, Genre.FICTION);
+        var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(nonExistent).exchange()
                 .expectStatus().isNotFound();
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullId() {
-        var invalidDto = new BookDto(null, "9780000000000", "Valid Title", 0, Genre.FICTION);
+        var invalidDto = new BookDto(null, "9780000000000", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullIsbn() {
-        var invalidDto = new BookDto(UUID.randomUUID(), null, "Valid Title", 0, Genre.FICTION);
+        var invalidDto = new BookDto(UUID.randomUUID(), null, "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithEmptyIsbn() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "", "Valid Title", 0, Genre.FICTION);
+        var invalidDto = new BookDto(UUID.randomUUID(), "", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithIsbnExceedingMaxLength() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "12345678901234", "Valid Title", 0, Genre.FICTION);
+        var invalidDto = new BookDto(UUID.randomUUID(), "12345678901234", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullTitle() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", null, 0, Genre.FICTION);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", null, 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithEmptyTitle() {
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "", 0, Genre.FICTION);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
@@ -105,7 +107,7 @@ class UpdateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn400WhenUpdatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(256);
-        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle, 0, Genre.FICTION);
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle, 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }

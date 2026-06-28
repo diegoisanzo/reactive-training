@@ -1,8 +1,8 @@
 package ar.training.reactive.fixture.book;
 
 import ar.training.reactive.domain.model.Genre;
-import ar.training.reactive.infrastructure.adapter.in.rest.BookDto;
-import ar.training.reactive.infrastructure.adapter.in.rest.RestBookDtoMapper;
+import ar.training.reactive.infrastructure.adapter.in.rest.book.BookDto;
+import ar.training.reactive.infrastructure.adapter.in.rest.book.RestBookDtoMapper;
 import org.mapstruct.factory.Mappers;
 
 public class BookDtoFixture {
@@ -21,6 +21,7 @@ public class BookDtoFixture {
                 "9780132350888",
                 "Clean Code: Updated",
                 20,
-                Genre.TECHNOLOGY);
+                Genre.TECHNOLOGY,
+                withDefaults().authorId());
     }
 }

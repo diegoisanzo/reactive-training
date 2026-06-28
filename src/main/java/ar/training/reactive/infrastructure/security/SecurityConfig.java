@@ -1,7 +1,7 @@
 package ar.training.reactive.infrastructure.security;
 
-import ar.training.reactive.infrastructure.adapter.in.rest.AuthController;
-import ar.training.reactive.infrastructure.adapter.in.rest.BookController;
+import ar.training.reactive.infrastructure.adapter.in.rest.auth.AuthController;
+import ar.training.reactive.infrastructure.adapter.in.rest.book.BookController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

@@ -1,7 +1,7 @@
 package ar.training.reactive.fixture.book;
 
 import ar.training.reactive.domain.model.Book;
-import ar.training.reactive.infrastructure.adapter.out.persistence.BookDBData;
+import ar.training.reactive.infrastructure.adapter.out.persistence.book.BookDBData;
 
 import java.util.List;
 
@@ -16,6 +16,6 @@ public class BookFixture {
     }
 
     private static Book copy(Book b) {
-        return new Book(b.getId(), b.getIsbn(), b.getTitle(), b.getAvailableCopies(), b.getGenre());
+        return new Book(b.getId(), b.getIsbn(), b.getTitle(), b.getAvailableCopies(), b.getGenre(), b.getAuthorId());
     }
 }

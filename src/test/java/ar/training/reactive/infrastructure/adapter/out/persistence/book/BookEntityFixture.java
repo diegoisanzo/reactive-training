@@ -1,7 +1,6 @@
 package ar.training.reactive.infrastructure.adapter.out.persistence.book;
 
 import ar.training.reactive.fixture.book.BookDtoFixture;
-import ar.training.reactive.infrastructure.adapter.out.persistence.BookEntity;
 
 public class BookEntityFixture {
 
@@ -12,7 +11,8 @@ public class BookEntityFixture {
                 bookDto.isbn(),
                 bookDto.title(),
                 bookDto.availableCopies(),
-                bookDto.genre()
+                bookDto.genre(),
+                bookDto.authorId()
         );
     }
 

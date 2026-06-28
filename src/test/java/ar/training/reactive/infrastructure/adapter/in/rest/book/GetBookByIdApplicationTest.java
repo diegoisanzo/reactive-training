@@ -5,7 +5,6 @@ import ar.training.reactive.application.port.in.book.GetBookByIdInboundPort;
 import ar.training.reactive.fixture.book.BookDtoFixture;
 import ar.training.reactive.fixture.book.BookFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
-import ar.training.reactive.infrastructure.adapter.in.rest.BookDto;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
 import ar.training.reactive.infrastructure.security.JwtService;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.UUID;
 
-import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_BY_ID_PATH;
+import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_BY_ID_PATH;
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

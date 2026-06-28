@@ -1,5 +1,6 @@
 package ar.training.reactive.infrastructure.config;
 
+import ar.training.reactive.application.port.out.author.AuthorRepositoryOutboundPort;
 import ar.training.reactive.application.port.out.book.BookRepositoryOutboundPort;
 import ar.training.reactive.application.usecase.book.*;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +14,8 @@ public class BookUseCaseConfig {
     // ==========================================
 
     @Bean
-    public CreateBookUseCase createBookUseCase(BookRepositoryOutboundPort bookRepositoryPort) {
-        return new CreateBookUseCase(bookRepositoryPort);
+    public CreateBookUseCase createBookUseCase(BookRepositoryOutboundPort bookRepositoryPort, AuthorRepositoryOutboundPort authorRepositoryPort) {
+        return new CreateBookUseCase(bookRepositoryPort, authorRepositoryPort);
     }
 
     @Bean

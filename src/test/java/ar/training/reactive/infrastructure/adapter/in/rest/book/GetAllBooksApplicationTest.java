@@ -5,7 +5,6 @@ import ar.training.reactive.application.port.in.book.GetAllBooksInboundPort;
 import ar.training.reactive.domain.model.Book;
 import ar.training.reactive.fixture.book.BookDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
-import ar.training.reactive.infrastructure.adapter.in.rest.BookDto;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
 import ar.training.reactive.infrastructure.security.JwtService;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_PATH;
+import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_PATH;
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static org.mockito.Mockito.doAnswer;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;

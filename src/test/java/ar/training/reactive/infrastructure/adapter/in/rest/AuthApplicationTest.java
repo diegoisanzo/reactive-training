@@ -1,6 +1,8 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
 import ar.training.reactive.SharedContainers;
+import ar.training.reactive.infrastructure.adapter.in.rest.auth.LoginDto;
+import ar.training.reactive.infrastructure.adapter.in.rest.auth.TokenDto;
 import ar.training.reactive.infrastructure.security.JwtService;
 import ar.training.reactive.infrastructure.security.Role;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
-import static ar.training.reactive.infrastructure.adapter.in.rest.AuthController.LOGIN_PATH;
+import static ar.training.reactive.infrastructure.adapter.in.rest.auth.AuthController.LOGIN_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -1,7 +1,7 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
-import ar.training.reactive.domain.exception.book.BookAlreadyExistsException;
-import ar.training.reactive.domain.exception.book.BookNotFoundException;
+import ar.training.reactive.domain.exception.ConflictException;
+import ar.training.reactive.domain.exception.NotFoundException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +20,10 @@ import static org.springframework.http.ProblemDetail.forStatus;
 @RestControllerAdvice
 public class ExceptionsHandler {
 
-    @ExceptionHandler(BookAlreadyExistsException.class)
-    public ResponseEntity<ProblemDetail> handleBookAlreadyExists(BookAlreadyExistsException ex) {
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ProblemDetail> handleConflict(ConflictException ex) {
         var problemDetail = forStatus(CONFLICT);
-        problemDetail.setTitle("Book already exists");
+        problemDetail.setTitle(ex.getTitle());
         problemDetail.setDetail(ex.getMessage());
 
         return ResponseEntity
@@ -31,10 +31,10 @@ public class ExceptionsHandler {
                 .build();
     }
 
-    @ExceptionHandler(BookNotFoundException.class)
-    public ResponseEntity<ProblemDetail> handleBookNotFound(BookNotFoundException ex) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleNotFound(NotFoundException ex) {
         var problemDetail = forStatus(NOT_FOUND);
-        problemDetail.setTitle("Book not found");
+        problemDetail.setTitle(ex.getTitle());
         problemDetail.setDetail(ex.getMessage());
 
         return ResponseEntity
@@ -44,9 +44,9 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(RequestNotPermitted.class)
     public ResponseEntity<ProblemDetail> handleRateLimitExceeded(RequestNotPermitted ex) {
-        var detail = forStatus(TOO_MANY_REQUESTS);
-        detail.setTitle("Rate limit exceeded");
-        return ResponseEntity.of(detail).build();
+        var problemDetail = forStatus(TOO_MANY_REQUESTS);
+        problemDetail.setTitle("Rate limit exceeded");
+        return ResponseEntity.of(problemDetail).build();
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
@@ -71,7 +71,6 @@ public class ExceptionsHandler {
     }
 
     static class ExceptionHandlerUtils {
-
         static Object nullToLiteralString(Object value) {
             if (value == null) {
                 return "null";

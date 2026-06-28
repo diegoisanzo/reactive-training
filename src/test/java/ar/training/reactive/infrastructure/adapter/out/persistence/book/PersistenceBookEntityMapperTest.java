@@ -1,7 +1,6 @@
 package ar.training.reactive.infrastructure.adapter.out.persistence.book;
 
 import ar.training.reactive.fixture.book.BookFixture;
-import ar.training.reactive.infrastructure.adapter.out.persistence.PersistenceBookEntityMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -30,5 +29,6 @@ public class PersistenceBookEntityMapperTest {
         assertEquals(book.getId(), bookEntity.getId());
         assertEquals(book.getIsbn(), bookEntity.getIsbn());
         assertEquals(book.getTitle(), bookEntity.getTitle());
+        assertEquals(book.getAuthorId(), bookEntity.getAuthorId());
     }
 }

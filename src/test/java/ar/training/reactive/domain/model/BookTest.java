@@ -15,7 +15,7 @@ class BookTest {
     @Test
     void shouldUpdateFromAnotherBook() {
         var book = BookFixture.withDefaults();
-        var other = new Book(book.getId(), "new-isbn", "new-title", 99, Genre.FICTION);
+        var other = new Book(book.getId(), "new-isbn", "new-title", 99, Genre.FICTION, book.getAuthorId());
 
         boolean dirty = book.updateFrom(other);
 
@@ -27,7 +27,7 @@ class BookTest {
     @Test
     void shouldNotBeDirtyWhenUpdatingWithSameValues() {
         var book = BookFixture.withDefaults();
-        var other = new Book(book.getId(), book.getIsbn(), book.getTitle(), book.getAvailableCopies(), book.getGenre());
+        var other = new Book(book.getId(), book.getIsbn(), book.getTitle(), book.getAvailableCopies(), book.getGenre(), book.getAuthorId());
 
         boolean dirty = book.updateFrom(other);
 
@@ -37,8 +37,9 @@ class BookTest {
     @Test
     void shouldBeEqualWhenIdsAreSame() {
         var id = UUID.randomUUID();
-        var book1 = new Book(id, "isbn1", "title1", 0, Genre.FICTION);
-        var book2 = new Book(id, "isbn2", "title2", 0, Genre.FICTION);
+        var authorId = UUID.randomUUID();
+        var book1 = new Book(id, "isbn1", "title1", 0, Genre.FICTION, authorId);
+        var book2 = new Book(id, "isbn2", "title2", 0, Genre.FICTION, authorId);
 
         assertEquals(book1, book2);
         assertEquals(book1.hashCode(), book2.hashCode());
@@ -46,8 +47,9 @@ class BookTest {
 
     @Test
     void shouldNotBeEqualWhenIdsAreDifferent() {
-        var book1 = new Book(UUID.randomUUID(), "isbn", "title", 0, Genre.FICTION);
-        var book2 = new Book(UUID.randomUUID(), "isbn", "title", 0, Genre.FICTION);
+        var authorId = UUID.randomUUID();
+        var book1 = new Book(UUID.randomUUID(), "isbn", "title", 0, Genre.FICTION, authorId);
+        var book2 = new Book(UUID.randomUUID(), "isbn", "title", 0, Genre.FICTION, authorId);
 
         assertNotEquals(book1, book2);
     }

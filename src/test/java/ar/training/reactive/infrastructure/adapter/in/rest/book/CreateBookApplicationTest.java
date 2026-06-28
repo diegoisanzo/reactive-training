@@ -7,9 +7,8 @@ import ar.training.reactive.domain.model.Book;
 import ar.training.reactive.domain.model.Genre;
 import ar.training.reactive.fixture.book.CreateBookDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
-import ar.training.reactive.infrastructure.adapter.in.rest.BookDto;
-import ar.training.reactive.infrastructure.adapter.in.rest.CreateBookDto;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
+import ar.training.reactive.infrastructure.adapter.out.persistence.author.AuthorDBData;
 import ar.training.reactive.infrastructure.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +21,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.UUID;
 
-import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_BY_ID_PATH;
-import static ar.training.reactive.infrastructure.adapter.in.rest.BookController.BOOK_PATH;
+import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_BY_ID_PATH;
+import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_PATH;
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,6 +36,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
 class CreateBookApplicationTest extends BaseApplicationTest {
+
+    private static final UUID AUTHOR_ID = AuthorDBData.ALL.getFirst().getId();
 
     @MockitoSpyBean
     private CreateBookInboundPort createBookInboundPort;
@@ -59,6 +61,9 @@ class CreateBookApplicationTest extends BaseApplicationTest {
                     assertNotNull(newBookDto.id());
                     assertEquals(createBookDto.isbn(), newBookDto.isbn());
                     assertEquals(createBookDto.title(), newBookDto.title());
+                    assertEquals(createBookDto.availableCopies(), newBookDto.availableCopies());
+                    assertEquals(createBookDto.genre(), newBookDto.genre());
+                    assertEquals(createBookDto.authorId(), newBookDto.authorId());
                 });
     }
 
@@ -74,6 +79,8 @@ class CreateBookApplicationTest extends BaseApplicationTest {
                 .returnResult()
                 .getResponseBody();
 
+        assertNotNull(created);
+
         authedReadUserClient().get()
                 .uri(BOOK_BY_ID_PATH, created.id())
                 .exchange()
@@ -84,7 +91,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithNullIsbn() {
-        var invalidDto = new CreateBookDto(null, "Valid Title", 0, Genre.FICTION);
+        var invalidDto = new CreateBookDto(null, "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().post()
                 .uri(BOOK_PATH)
                 .bodyValue(invalidDto)
@@ -100,28 +107,28 @@ class CreateBookApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyIsbn() {
-        var invalidDto = new CreateBookDto("", "Valid Title", 0, Genre.FICTION);
+        var invalidDto = new CreateBookDto("", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithIsbnExceedingMaxLength() {
-        var invalidDto = new CreateBookDto("12345678901234", "Valid Title", 0, Genre.FICTION);
+        var invalidDto = new CreateBookDto("12345678901234", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithNullTitle() {
-        var invalidDto = new CreateBookDto("9780000000000", null, 0, Genre.FICTION);
+        var invalidDto = new CreateBookDto("9780000000000", null, 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyTitle() {
-        var invalidDto = new CreateBookDto("9780000000000", "", 0, Genre.FICTION);
+        var invalidDto = new CreateBookDto("9780000000000", "", 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
@@ -129,7 +136,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn400WhenCreatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(256);
-        var invalidDto = new CreateBookDto("9780000000000", longTitle, 0, Genre.FICTION);
+        var invalidDto = new CreateBookDto("9780000000000", longTitle, 0, Genre.FICTION, AUTHOR_ID);
         authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
                 .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
     }
@@ -158,7 +165,9 @@ class CreateBookApplicationTest extends BaseApplicationTest {
         doAnswer(invocation -> Mono.error(new BookAlreadyExistsException(existingBookId)))
                 .when(createBookInboundPort)
                 .createBook(any(Book.class));
+
         var createBookDto = CreateBookDtoFixture.withDefaults();
+
         authedReadWriteUserClient().post()
                 .uri(BOOK_PATH)
                 .bodyValue(createBookDto)
