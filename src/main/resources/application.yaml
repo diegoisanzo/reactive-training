@@ -9,6 +9,9 @@ spring:
     password: ${SPRING_R2DBC_PASSWORD:p}
   application:
     name: reactive-training
+  threads:
+    virtual:
+      enabled: true
 
 resilience4j:
   timelimiter:
