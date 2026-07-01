@@ -12,8 +12,8 @@ RUN gradle dependencies --no-daemon
 COPY src src
 RUN gradle bootJar --no-daemon
 
-# Stage 2: Runtime (minimal JRE via Chisel for Java 25)
-FROM ubuntu/jre:25-26.04_edge
+# Stage 2: Runtime (minimal JRE -distroless- for Java 25)
+FROM gcr.io/distroless/java25-debian13
 WORKDIR /app
 EXPOSE 8080
 
