@@ -1,6 +1,7 @@
 package ar.training.reactive.infrastructure.security;
 
 import ar.training.reactive.infrastructure.adapter.in.rest.auth.AuthController;
+import ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController;
 import ar.training.reactive.infrastructure.adapter.in.rest.book.BookController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +37,10 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, BookController.BOOK_PATH).hasRole(Role.WRITE.name())
                         .pathMatchers(HttpMethod.PUT, BookController.BOOK_PATH).hasRole(Role.WRITE.name())
                         .pathMatchers(HttpMethod.DELETE, BookController.BOOK_PATH + "/**").hasRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.GET, AuthorController.AUTHOR_PATH, AuthorController.AUTHOR_PATH + "/**").hasRole(Role.READ.name())
+                        .pathMatchers(HttpMethod.POST, AuthorController.AUTHOR_PATH).hasRole(Role.WRITE.name())
+                        .pathMatchers(HttpMethod.PUT, AuthorController.AUTHOR_PATH).hasRole(Role.WRITE.name())
+                        .pathMatchers(HttpMethod.DELETE, AuthorController.AUTHOR_PATH + "/**").hasRole(Role.ADMIN.name())
                         .anyExchange().authenticated()
                 )
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)

@@ -22,27 +22,32 @@ infrastructure  — Spring adapters (REST, persistence)
 ### Layers
 
 **`domain/`**
-The core. Contains the `Book` model and domain exceptions. No Spring, no R2DBC, no framework annotations.
+The core. Contains the `Author`, `Book`, and `Genre` models, plus domain exceptions organized by entity (`exception/author/`, `exception/book/`). No Spring, no R2DBC, no framework annotations.
 
 **`application/`**
-Use cases and port interfaces, organized vertically by operation:
+Use cases and port interfaces, organized by entity:
 
 ```
 application/
   port/
-    in/   — inbound port interfaces (one per use case)
-    out/  — outbound port interfaces (e.g. BookRepositoryOutboundPort)
+    in/
+      author/ — CreateAuthorInboundPort, GetAllAuthorsInboundPort, GetAuthorByIdInboundPort,
+                UpdateAuthorInboundPort, DeleteAuthorByIdInboundPort
+      book/   — CreateBookInboundPort, GetAllBooksInboundPort, GetBookByIdInboundPort,
+                UpdateBookInboundPort, DeleteBookByIdInboundPort
+    out/
+      author/ — AuthorRepositoryOutboundPort
+      book/   — BookRepositoryOutboundPort
   usecase/
-    CreateBookUseCase
-    GetAllBooksUseCase
-    GetBookByIdUseCase
-    UpdateBookUseCase
-    DeleteBookByIdUseCase
+    author/ — CreateAuthorUseCase, GetAllAuthorsUseCase, GetAuthorByIdUseCase,
+              UpdateAuthorUseCase, DeleteAuthorByIdUseCase
+    book/   — CreateBookUseCase, GetAllBooksUseCase, GetBookByIdUseCase,
+              UpdateBookUseCase, DeleteBookByIdUseCase
 ```
 
-Each inbound port (`CreateBookInboundPort`, `GetAllBooksInboundPort`, etc.) defines the contract for one use case. Each use case class implements exactly one inbound port. This follows the Interface Segregation Principle — callers depend only on what they actually use.
+Each inbound port defines the contract for one use case. Each use case class implements exactly one inbound port. This follows the Interface Segregation Principle — callers depend only on what they actually use.
 
-The outbound port (`BookRepositoryOutboundPort`) decouples use cases from the persistence mechanism.
+Outbound ports (`AuthorRepositoryOutboundPort`, `BookRepositoryOutboundPort`) decouple use cases from the persistence mechanism.
 
 > **Note on reactivity:** port interfaces and use cases return `Mono<T>` and `Flux<T>` (Reactor) directly rather than a framework-agnostic type. In a stricter hexagonal setup the application layer would be isolated from any specific reactive library, but that trade-off was accepted here in favour of simplicity — Reactor is pervasive across the whole stack and abstracting over it would add complexity with little practical benefit.
 
@@ -52,10 +57,19 @@ Adapters that connect the application to the outside world:
 ```
 infrastructure/
   adapter/
-    in/rest/        — AuthController, BookController, DTOs, ExceptionsHandler
-    out/persistence/ — BookRepositoryOutboundAdapter, BookEntity, PersistenceBookMapper,
-                       PersistenceBookEntityMapper, R2dbcBookRepository, DBConfigCommandLineRunner
-  security/         — JwtService, JwtAuthenticationWebFilter, SecurityConfig, Role
+    in/rest/
+      auth/        — AuthController, LoginDto, TokenDto
+      author/      — AuthorController, AuthorDto, CreateAuthorDto, RestAuthorDtoMapper, RestAuthorMapper
+      book/        — BookController, BookDto, CreateBookDto, RestBookDtoMapper, RestBookMapper
+      ExceptionsHandler
+    out/persistence/
+      author/      — AuthorRepositoryOutboundAdapter, AuthorEntity, AuthorDBData,
+                     PersistenceAuthorMapper, PersistenceAuthorEntityMapper, R2dbcAuthorRepository
+      book/        — BookRepositoryOutboundAdapter, BookEntity, BookDBData,
+                     PersistenceBookMapper, PersistenceBookEntityMapper, R2dbcBookRepository
+      BaseEntity, DBConfigCommandLineRunner
+  config/          — AuthorUseCaseConfig, BookUseCaseConfig
+  security/        — JwtService, JwtAuthenticationWebFilter, SecurityConfig, Role
 ```
 
 ### Request flow
@@ -95,13 +109,18 @@ Authorization: Bearer <jwt>
 
 Roles are defined in the `Role` enum (`READ`, `WRITE`, `ADMIN`). Access rules per endpoint:
 
-| HTTP Verb | Endpoint         | Required role |
-|-----------|------------------|---------------|
-| GET       | `/v1/books`      | READ          |
-| GET       | `/v1/books/{id}` | READ          |
-| POST      | `/v1/books`      | WRITE         |
-| PUT       | `/v1/books`      | WRITE         |
-| DELETE    | `/v1/books/{id}` | ADMIN         |
+| HTTP Verb | Endpoint            | Required role    |
+|-----------|---------------------|------------------|
+| GET       | `/v1/books`         | READ             |
+| GET       | `/v1/books/{id}`    | READ             |
+| POST      | `/v1/books`         | WRITE            |
+| PUT       | `/v1/books`         | WRITE            |
+| DELETE    | `/v1/books/{id}`    | ADMIN            |
+| GET       | `/v1/authors`       | READ             |
+| GET       | `/v1/authors/{id}`  | READ             |
+| POST      | `/v1/authors`       | WRITE            |
+| PUT       | `/v1/authors`       | WRITE            |
+| DELETE    | `/v1/authors/{id}`  | ADMIN            |
 
 In-memory users for local development:
 
