@@ -9,7 +9,7 @@ import ar.training.reactive.fixture.book.CreateBookDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
 import ar.training.reactive.infrastructure.adapter.out.persistence.author.AuthorDBData;
-import ar.training.reactive.infrastructure.security.JwtService;
+import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -92,53 +92,38 @@ class CreateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn400WhenCreatingBookWithNullIsbn() {
         var invalidDto = new CreateBookDto(null, "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        authedReadWriteUserClient().post()
-                .uri(BOOK_PATH)
-                .bodyValue(invalidDto)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ProblemDetail.class)
-                .consumeWith(result -> {
-                    var detail = result.getResponseBody();
-                    assertNotNull(detail);
-                    assertEquals(400, detail.getStatus());
-                });
+        assertBadRequestOnPost(BOOK_PATH, invalidDto);
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyIsbn() {
         var invalidDto = new CreateBookDto("", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto);
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithIsbnExceedingMaxLength() {
         var invalidDto = new CreateBookDto("12345678901234", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto);
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithNullTitle() {
         var invalidDto = new CreateBookDto("9780000000000", null, 0, Genre.FICTION, AUTHOR_ID);
-        authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto);
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyTitle() {
         var invalidDto = new CreateBookDto("9780000000000", "", 0, Genre.FICTION, AUTHOR_ID);
-        authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto);
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(256);
         var invalidDto = new CreateBookDto("9780000000000", longTitle, 0, Genre.FICTION, AUTHOR_ID);
-        authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto);
     }
 
     @Test

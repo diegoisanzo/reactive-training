@@ -3,7 +3,7 @@ package ar.training.reactive.infrastructure.adapter.in.rest;
 import ar.training.reactive.SharedContainers;
 import ar.training.reactive.infrastructure.adapter.in.rest.auth.LoginDto;
 import ar.training.reactive.infrastructure.adapter.in.rest.auth.TokenDto;
-import ar.training.reactive.infrastructure.security.JwtService;
+import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import ar.training.reactive.infrastructure.security.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

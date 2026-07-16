@@ -4,13 +4,12 @@ import ar.training.reactive.SharedContainers;
 import ar.training.reactive.fixture.author.CreateAuthorDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
-import ar.training.reactive.infrastructure.security.JwtService;
+import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
-import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
@@ -52,32 +51,24 @@ class UpdateAuthorApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingAuthorWithNullId() {
-        var invalidDto = new AuthorDto(null, "Valid Name");
-        authedReadWriteUserClient().put().uri(AUTHOR_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPut(AUTHOR_PATH, new AuthorDto(null, "Valid Name"));
     }
 
     @Test
     void shouldReturn400WhenUpdatingAuthorWithNullName() {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
-        var invalidDto = new AuthorDto(created.id(), null);
-        authedReadWriteUserClient().put().uri(AUTHOR_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPut(AUTHOR_PATH, new AuthorDto(created.id(), null));
     }
 
     @Test
     void shouldReturn400WhenUpdatingAuthorWithEmptyName() {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
-        var invalidDto = new AuthorDto(created.id(), "");
-        authedReadWriteUserClient().put().uri(AUTHOR_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPut(AUTHOR_PATH, new AuthorDto(created.id(), ""));
     }
 
     @Test
     void shouldReturn400WhenUpdatingAuthorWithBlankName() {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
-        var invalidDto = new AuthorDto(created.id(), "   ");
-        authedReadWriteUserClient().put().uri(AUTHOR_PATH).bodyValue(invalidDto).exchange()
-                .expectStatus().isBadRequest().expectBody(ProblemDetail.class);
+        assertBadRequestOnPut(AUTHOR_PATH, new AuthorDto(created.id(), "   "));
     }
 }

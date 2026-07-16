@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option java_package = "ar.training.reactive";
+option java_multiple_files = true;
+
+service BookGrpcService {
+  rpc GetAllBooks (google.protobuf.Empty) returns (BookListProto);
+}
+
+message BookProto {
+  string id = 1;
+  string isbn = 2;
+  string title = 3;
+  int64 available_copies = 4;
+  string genre = 5;
+  string author_id = 6;
+}
+
+message BookListProto {
+  repeated BookProto books = 1;
+}
+
+service AuthorGrpcService {
+  rpc GetAllAuthors (google.protobuf.Empty) returns (AuthorListProto);
+}
+
+message AuthorProto {
+  string id = 1;
+  string name = 2;
+}
+
+message AuthorListProto {
+  repeated AuthorProto authors = 1;
+}

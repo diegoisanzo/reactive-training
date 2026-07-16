@@ -1,4 +1,4 @@
-package ar.training.reactive.infrastructure.security;
+package ar.training.reactive.infrastructure.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,6 +20,8 @@ import static ar.training.reactive.infrastructure.security.Role.SPRING_SECURITY_
 
 @Service
 public class JwtService {
+
+    public static final String BEARER_PREFIX = "Bearer ";
 
     private static final String ROLES_CLAIM = "roles";
 
@@ -74,6 +76,13 @@ public class JwtService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static String extractBearerToken(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+            return null;
+        }
+        return authorizationHeader.substring(BEARER_PREFIX.length());
     }
 
     public String extractUsername(String token) {

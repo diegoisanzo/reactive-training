@@ -1,6 +1,6 @@
 package ar.training.reactive.infrastructure.adapter.in.rest.auth;
 
-import ar.training.reactive.infrastructure.security.JwtService;
+import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;

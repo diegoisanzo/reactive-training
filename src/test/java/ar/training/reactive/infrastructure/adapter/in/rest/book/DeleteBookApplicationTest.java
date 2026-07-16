@@ -5,7 +5,7 @@ import ar.training.reactive.application.port.in.book.DeleteBookByIdInboundPort;
 import ar.training.reactive.fixture.book.BookDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
-import ar.training.reactive.infrastructure.security.JwtService;
+import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

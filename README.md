@@ -1,11 +1,12 @@
 # reactive-training
 
-Spring Boot 4 + WebFlux reactive REST API backed by PostgreSQL via R2DBC. Java 25.
+Spring Boot 4 + WebFlux reactive REST API backed by PostgreSQL via R2DBC. Java 25. Also exposes a gRPC API on a separate port.
 
 ## Stack
 
 - Spring Boot 4 / WebFlux (non-blocking, reactive)
 - Spring Security + JWT (stateless authentication)
+- Spring gRPC (gRPC server, secured with the same JWT)
 - R2DBC + PostgreSQL
 - Testcontainers (integration tests)
 
@@ -62,6 +63,9 @@ infrastructure/
       author/      — AuthorController, AuthorDto, CreateAuthorDto, RestAuthorDtoMapper, RestAuthorMapper
       book/        — BookController, BookDto, CreateBookDto, RestBookDtoMapper, RestBookMapper
       ExceptionsHandler
+    in/grpc/
+      author/      — AuthorGrpcService, GrpcAuthorProtoMapper
+      book/        — BookGrpcService, GrpcBookProtoMapper
     out/persistence/
       author/      — AuthorRepositoryOutboundAdapter, AuthorEntity, AuthorDBData,
                      PersistenceAuthorMapper, PersistenceAuthorEntityMapper, R2dbcAuthorRepository
@@ -69,8 +73,12 @@ infrastructure/
                      PersistenceBookMapper, PersistenceBookEntityMapper, R2dbcBookRepository
       BaseEntity, DBConfigCommandLineRunner
   config/          — AuthorUseCaseConfig, BookUseCaseConfig
-  security/        — JwtService, JwtAuthenticationWebFilter, SecurityConfig, Role
+  security/        — JwtService, SecurityConfig, Role
+    rest/          — JwtAuthenticationWebFilter
+    grpc/          — JwtGrpcAuthenticationExtractor, JwtGrpcAuthenticationProvider
 ```
+
+The gRPC services are inbound adapters, just like the REST controllers: they call the same inbound ports and use cases. Service and message definitions live in `src/main/proto/reactive-training.proto`; the Java stubs are generated at build time by the protobuf Gradle plugin.
 
 ### Request flow
 
@@ -130,6 +138,27 @@ In-memory users for local development:
 | `read-write-user`| `password` | READ, WRITE        |
 | `admin-user`     | `password` | READ, WRITE, ADMIN |
 
+### gRPC security
+
+The gRPC server runs on its own Netty instance (port `9090`), so the WebFlux `SecurityWebFilterChain` does not apply to it. Security is wired through a `ServerInterceptor` bean (`grpcSecurityChain` in `SecurityConfig`, registered via `@GlobalServerInterceptor`) built with the `GrpcSecurity` DSL:
+
+- `JwtGrpcAuthenticationExtractor` reads the `authorization` metadata header and extracts the Bearer token.
+- `JwtGrpcAuthenticationProvider` validates the token with the same `JwtService` used by the REST API.
+
+The same JWT issued by `POST /auth/login` works on both ports — send it as gRPC metadata:
+
+```
+authorization: Bearer <jwt>
+```
+
+Access rules per gRPC method:
+
+| Method                            | Required role  |
+|-----------------------------------|----------------|
+| `BookGrpcService/GetAllBooks`     | READ           |
+| `AuthorGrpcService/GetAllAuthors` | READ           |
+| any other method                  | authenticated  |
+
 ## Resilience
 
 Resilience patterns are applied at the controller layer via Resilience4j annotations. Each endpoint has its own named instance, configured independently in `application.yaml`.
@@ -162,7 +191,7 @@ Builds the app image and starts both the app and PostgreSQL:
 docker compose up --build
 ```
 
-The API will be available at `http://localhost:8080`.
+The REST API will be available at `http://localhost:8080` and the gRPC server at `localhost:9090`.
 
 To build just the app image manually, with the same name Compose would use:
 
@@ -190,6 +219,8 @@ Then run the application:
 ```bash
 ./gradlew bootRun
 ```
+
+The REST API listens on `http://localhost:8080` and the gRPC server on `localhost:9090`.
 
 The table schema and seed data are created at startup by `DBConfigCommandLineRunner` (no Flyway/Liquibase).
 

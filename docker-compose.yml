@@ -3,6 +3,7 @@ services:
     build: .
     ports:
       - "8080:8080"
+      - "9090:9090"
     environment:
       SPRING_R2DBC_URL: r2dbc:postgresql://postgres:5432/postgres
       SPRING_R2DBC_USERNAME: postgres

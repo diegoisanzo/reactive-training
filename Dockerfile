@@ -15,7 +15,7 @@ RUN gradle bootJar --no-daemon
 # Stage 2: Runtime (minimal JRE -distroless- for Java 25)
 FROM gcr.io/distroless/java25-debian13
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 8080 9090
 
 # Copy the fat JAR built by Gradle
 COPY --from=build /app/build/libs/*.jar app.jar

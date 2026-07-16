@@ -1,5 +1,6 @@
-package ar.training.reactive.infrastructure.security;
+package ar.training.reactive.infrastructure.security.jwt.rest;
 
+import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -30,10 +31,6 @@ public class JwtAuthenticationWebFilter implements WebFilter {
     }
 
     private String extractAuthorizationBearerTokenFrom(ServerHttpRequest request) {
-        var authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        return authHeader.substring(7);
+        return JwtService.extractBearerToken(request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
     }
 }

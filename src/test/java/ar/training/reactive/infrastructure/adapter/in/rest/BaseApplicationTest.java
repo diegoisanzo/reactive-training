@@ -1,6 +1,6 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
-import ar.training.reactive.infrastructure.security.JwtService;
+import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import ar.training.reactive.infrastructure.security.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +45,24 @@ public abstract class BaseApplicationTest {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " +
                         jwtService.generateToken(username, roles))
                 .build();
+    }
+
+    protected void assertBadRequestOnPost(String path, Object invalidBody) {
+        assertBadRequest(authedReadWriteUserClient().post().uri(path).bodyValue(invalidBody));
+    }
+
+    protected void assertBadRequestOnPut(String path, Object invalidBody) {
+        assertBadRequest(authedReadWriteUserClient().put().uri(path).bodyValue(invalidBody));
+    }
+
+    private void assertBadRequest(WebTestClient.RequestHeadersSpec<?> request) {
+        request.exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class)
+                .value(problemDetail -> {
+                    assertNotNull(problemDetail);
+                    assertEquals(400, problemDetail.getStatus());
+                });
     }
 
     protected static void assertInternalServerError(ProblemDetail problemDetail, String path) {
