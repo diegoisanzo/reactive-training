@@ -28,7 +28,7 @@ public abstract class BaseGrpcApplicationTest {
     protected final JwtService jwtService;
 
     public BaseGrpcApplicationTest(GrpcChannelFactory channelFactory, TestDataSetup testDataSetup, JwtService jwtService) {
-        this.channel = channelFactory.createChannel("in-process");
+        this.channel = channelFactory.createChannel("test-in-process");
         this.testDataSetup = testDataSetup;
         this.jwtService = jwtService;
     }
