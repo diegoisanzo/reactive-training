@@ -9,7 +9,6 @@ import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
 import ar.training.reactive.infrastructure.adapter.out.persistence.author.AuthorDBData;
 import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import com.google.protobuf.Empty;
-import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import org.junit.jupiter.api.Test;
 
@@ -66,6 +65,14 @@ class GetAllAuthorsGrpcApplicationTest extends BaseGrpcApplicationTest {
     void shouldFailUnauthenticatedWithoutToken() {
         var exception = assertThrows(StatusRuntimeException.class,
                 () -> authorStub.getAllAuthors(Empty.getDefaultInstance()));
+
+        assertUnauthenticated(exception);
+    }
+
+    @Test
+    void shouldFailUnauthenticatedWithInvalidToken() {
+        var exception = assertThrows(StatusRuntimeException.class,
+                () -> invalidTokenStub(authorStub).getAllAuthors(Empty.getDefaultInstance()));
 
         assertUnauthenticated(exception);
     }

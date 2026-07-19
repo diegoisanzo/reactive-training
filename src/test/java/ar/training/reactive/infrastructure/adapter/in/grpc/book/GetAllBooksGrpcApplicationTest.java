@@ -19,9 +19,6 @@ import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.grpc.client.GrpcChannelFactory;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import static io.grpc.Status.Code.PERMISSION_DENIED;
-import static io.grpc.Status.Code.UNAUTHENTICATED;
-import static io.grpc.Status.Code.UNKNOWN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
