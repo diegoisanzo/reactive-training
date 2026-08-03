@@ -73,14 +73,17 @@ tasks.withType(Test).configureEach {
 }
 
 protobuf {
+	// Configures the official Protocol Buffers compiler version
 	protoc {
 		artifact = 'com.google.protobuf:protoc:3.25.8'
 	}
+	// Registers the gRPC Java code generation plugin
 	plugins {
 		grpc {
 			artifact = 'io.grpc:protoc-gen-grpc-java:1.82.1'
 		}
 	}
+	// Applies the gRPC plugin to all proto compilation tasks across every source set
 	generateProtoTasks {
 		all().each { task ->
 			task.plugins {
