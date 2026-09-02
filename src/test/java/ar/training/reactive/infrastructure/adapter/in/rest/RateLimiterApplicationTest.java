@@ -21,10 +21,15 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
         "resilience4j.ratelimiter.instances.createBookRateLimit.limitForPeriod=1",
+        "resilience4j.ratelimiter.instances.createBookRateLimit.limitRefreshPeriod=10s",
         "resilience4j.ratelimiter.instances.getAllBooksRateLimit.limitForPeriod=1",
+        "resilience4j.ratelimiter.instances.getAllBooksRateLimit.limitRefreshPeriod=10s",
         "resilience4j.ratelimiter.instances.getBookByIdRateLimit.limitForPeriod=1",
+        "resilience4j.ratelimiter.instances.getBookByIdRateLimit.limitRefreshPeriod=10s",
         "resilience4j.ratelimiter.instances.updateBookRateLimit.limitForPeriod=1",
+        "resilience4j.ratelimiter.instances.updateBookRateLimit.limitRefreshPeriod=10s",
         "resilience4j.ratelimiter.instances.deleteBookByIdRateLimit.limitForPeriod=1",
+        "resilience4j.ratelimiter.instances.deleteBookByIdRateLimit.limitRefreshPeriod=10s",
 })
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient

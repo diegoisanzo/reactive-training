@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.0'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.google.protobuf' version '0.9.5'
+	id 'com.google.protobuf' version '0.10.0'
 }
 
 group = 'ar.training'
@@ -16,7 +16,7 @@ java {
 
 ext {
 	jjwtVersion         = '0.12.6'
-	mapstructVersion    = '1.6.0'
+	mapstructVersion    = '1.6.3'
 	resilience4jVersion = '2.4.0'
 }
 
@@ -75,12 +75,12 @@ tasks.withType(Test).configureEach {
 protobuf {
 	// Configures the official Protocol Buffers compiler version
 	protoc {
-		artifact = 'com.google.protobuf:protoc:3.25.8'
+		artifact = 'com.google.protobuf:protoc:3.25.9'
 	}
 	// Registers the gRPC Java code generation plugin
 	plugins {
 		grpc {
-			artifact = 'io.grpc:protoc-gen-grpc-java:1.82.1'
+			artifact = 'io.grpc:protoc-gen-grpc-java:1.83.1'
 		}
 	}
 	// Applies the gRPC plugin to all proto compilation tasks across every source set
