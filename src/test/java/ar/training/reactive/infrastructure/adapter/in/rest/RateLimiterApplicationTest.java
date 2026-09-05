@@ -12,6 +12,13 @@ import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTest
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.CREATE_BOOK_RATE_LIMIT;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.DELETE_BOOK_BY_ID_RATE_LIMIT;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.GET_ALL_BOOKS_RATE_LIMIT;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.GET_BOOK_BY_ID_RATE_LIMIT;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.LIMIT_FOR_PERIOD;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.LIMIT_REFRESH_PERIOD;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.UPDATE_BOOK_RATE_LIMIT;
 import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_BY_ID_PATH;
 import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,20 +27,37 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
-        "resilience4j.ratelimiter.instances.createBookRateLimit.limitForPeriod=1",
-        "resilience4j.ratelimiter.instances.createBookRateLimit.limitRefreshPeriod=10s",
-        "resilience4j.ratelimiter.instances.getAllBooksRateLimit.limitForPeriod=1",
-        "resilience4j.ratelimiter.instances.getAllBooksRateLimit.limitRefreshPeriod=10s",
-        "resilience4j.ratelimiter.instances.getBookByIdRateLimit.limitForPeriod=1",
-        "resilience4j.ratelimiter.instances.getBookByIdRateLimit.limitRefreshPeriod=10s",
-        "resilience4j.ratelimiter.instances.updateBookRateLimit.limitForPeriod=1",
-        "resilience4j.ratelimiter.instances.updateBookRateLimit.limitRefreshPeriod=10s",
-        "resilience4j.ratelimiter.instances.deleteBookByIdRateLimit.limitForPeriod=1",
-        "resilience4j.ratelimiter.instances.deleteBookByIdRateLimit.limitRefreshPeriod=10s",
+        CREATE_BOOK_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        CREATE_BOOK_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        GET_ALL_BOOKS_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        GET_ALL_BOOKS_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        GET_BOOK_BY_ID_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        GET_BOOK_BY_ID_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        UPDATE_BOOK_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        UPDATE_BOOK_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        DELETE_BOOK_BY_ID_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        DELETE_BOOK_BY_ID_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
 })
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
 class RateLimiterApplicationTest extends BaseApplicationTest {
+
+    interface TestProperties {
+        String RESILIENCE4J_RATELIMITER_INSTANCES = "resilience4j.ratelimiter.instances.";
+
+        String CREATE_BOOK_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "createBookRateLimit.";
+        String GET_ALL_BOOKS_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "getAllBooksRateLimit.";
+        String GET_BOOK_BY_ID_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "getBookByIdRateLimit.";
+        String UPDATE_BOOK_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "updateBookRateLimit.";
+        String DELETE_BOOK_BY_ID_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "deleteBookByIdRateLimit.";
+
+        String LIMIT_FOR_PERIOD = "limitForPeriod=1";
+        String LIMIT_REFRESH_PERIOD = "limitRefreshPeriod=10s";
+    }
 
     @Autowired
     RateLimiterApplicationTest(WebTestClient webTestClient, TestDataSetup testDataSetup, JwtService jwtService) {

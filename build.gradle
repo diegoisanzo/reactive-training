@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '4.1.0'
+	id 'org.springframework.boot' version '4.1.1'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'com.google.protobuf' version '0.10.0'
 }
@@ -22,7 +22,7 @@ ext {
 
 repositories {
 	mavenCentral()
-//	maven { url = 'https://repo.spring.io/snapshot' }
+	maven { url = 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {
