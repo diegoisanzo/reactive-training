@@ -1,5 +1,5 @@
-# Stage 1: Build (Gradle 9.7.1 + JDK 25)
-FROM gradle:9.7.1-jdk25 AS build
+# Stage 1: Build (Gradle 9.8.2 + JDK 25)
+FROM gradle:9.8.2-jdk25 AS build
 WORKDIR /app
 
 # Copy Gradle config files first for Docker layer caching
