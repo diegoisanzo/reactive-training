@@ -80,7 +80,7 @@ protobuf {
 	// Registers the gRPC Java code generation plugin
 	plugins {
 		grpc {
-			artifact = 'io.grpc:protoc-gen-grpc-java:1.83.1'
+			artifact = 'io.grpc:protoc-gen-grpc-java:1.85.1'
 		}
 	}
 	// Applies the gRPC plugin to all proto compilation tasks across every source set
