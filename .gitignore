@@ -29,6 +29,8 @@ COPILOT.md
 CODY.md
 # QODO.md               Qodo (ex-CodiumAI)
 QODO.md
+# local code review files
+CODE_REVIEW*.md
 
 .gradle
 build/
