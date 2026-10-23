@@ -4,7 +4,6 @@ import ar.training.reactive.application.port.in.book.GetBookByIdInboundPort;
 import ar.training.reactive.application.port.out.book.BookRepositoryOutboundPort;
 import ar.training.reactive.domain.exception.book.BookNotFoundException;
 import ar.training.reactive.domain.model.Book;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;

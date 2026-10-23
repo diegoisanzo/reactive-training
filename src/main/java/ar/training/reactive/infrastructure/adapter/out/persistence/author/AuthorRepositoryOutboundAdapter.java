@@ -3,6 +3,7 @@ package ar.training.reactive.infrastructure.adapter.out.persistence.author;
 import ar.training.reactive.application.port.out.author.AuthorRepositoryOutboundPort;
 import ar.training.reactive.domain.exception.author.AuthorHasBooksException;
 import ar.training.reactive.domain.model.Author;
+import ar.training.reactive.infrastructure.adapter.out.persistence.PersistableEntitySaver;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -41,14 +42,7 @@ public class AuthorRepositoryOutboundAdapter implements AuthorRepositoryOutbound
     @Override
     public Mono<Author> save(Author author) {
         var entity = persistenceAuthorEntityMapper.toAuthorEntity(author);
-        return repository.existsById(author.getId())
-                .doOnNext(exists -> {
-                    if (exists) {
-                        entity.markAsExisting();
-                    }
-                })
-                .then(Mono.defer(() -> repository.save(entity)))
-                .map(persistenceAuthorMapper::toAuthor);
+        return PersistableEntitySaver.save(repository, entity, persistenceAuthorMapper::toAuthor);
     }
 
     @Override

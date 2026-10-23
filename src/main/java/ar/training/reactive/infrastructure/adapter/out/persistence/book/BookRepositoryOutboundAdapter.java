@@ -2,6 +2,7 @@ package ar.training.reactive.infrastructure.adapter.out.persistence.book;
 
 import ar.training.reactive.application.port.out.book.BookRepositoryOutboundPort;
 import ar.training.reactive.domain.model.Book;
+import ar.training.reactive.infrastructure.adapter.out.persistence.PersistableEntitySaver;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,14 +40,7 @@ public class BookRepositoryOutboundAdapter implements BookRepositoryOutboundPort
     @Override
     public Mono<Book> save(Book book) {
         var entity = persistenceBookEntityMapper.toBookEntity(book);
-        return repository.existsById(book.getId())
-                .doOnNext(exists -> {
-                    if (exists) {
-                        entity.markAsExisting();
-                    }
-                })
-                .then(Mono.defer(() -> repository.save(entity)))
-                .map(persistenceBookMapper::toBook);
+        return PersistableEntitySaver.save(repository, entity, persistenceBookMapper::toBook);
     }
 
     @Override
