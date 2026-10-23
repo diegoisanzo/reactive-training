@@ -3,6 +3,7 @@ package ar.training.reactive.infrastructure.adapter.in.grpc.book;
 import ar.training.reactive.BookGrpcServiceGrpc;
 import ar.training.reactive.BookListProto;
 import ar.training.reactive.application.port.in.book.GetAllBooksInboundPort;
+import ar.training.reactive.infrastructure.adapter.in.grpc.GrpcReactiveStream;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
@@ -25,19 +26,10 @@ public class BookGrpcService extends BookGrpcServiceGrpc.BookGrpcServiceImplBase
 
     public void getAllBooks(Empty empty, StreamObserver<BookListProto> responseObserver) {
         logger.info("BookGrpcService::getAllBooks()");
-        BookListProto.Builder bookListProtoBuilder = BookListProto.newBuilder();
-        getAllBooksInboundPort.getAllBooks()
-                .map(grpcBookProtoMapper::toBookProto)
-                .subscribe(
-                    bookListProtoBuilder::addBooks,
-                    responseObserver::onError,
-                    () -> {
-                         var bookListProto = bookListProtoBuilder.build();
-                         responseObserver.onNext(bookListProto);
-                         responseObserver.onCompleted();
-                    }
-                );
+        GrpcReactiveStream.collect(
+                getAllBooksInboundPort.getAllBooks().map(grpcBookProtoMapper::toBookProto),
+                responseObserver,
+                books -> BookListProto.newBuilder().addAllBooks(books).build()
+        );
     }
-
-
 }

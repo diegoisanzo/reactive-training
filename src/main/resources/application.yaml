@@ -15,41 +15,40 @@ spring:
 
 resilience4j:
   timelimiter:
+    configs:
+      default:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
     instances:
       createBookTimeout:
+        baseConfig: default
         timeoutDuration: 2s
-        cancelRunningFuture: true
       getBookByIdTimeout:
+        baseConfig: default
         timeoutDuration: 1s
-        cancelRunningFuture: true
       getAllBooksTimeout:
+        baseConfig: default
         timeoutDuration: 3s
-        cancelRunningFuture: true
       updateBookTimeout:
+        baseConfig: default
         timeoutDuration: 2s
-        cancelRunningFuture: true
       deleteBookByIdTimeout:
+        baseConfig: default
         timeoutDuration: 1s
-        cancelRunningFuture: true
   ratelimiter:
+    configs:
+      default:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0ms
     instances:
       createBookRateLimit:
-        limitForPeriod: 100
-        limitRefreshPeriod: 1s
-        timeoutDuration: 0ms
+        baseConfig: default
       getAllBooksRateLimit:
-        limitForPeriod: 100
-        limitRefreshPeriod: 1s
-        timeoutDuration: 0ms
+        baseConfig: default
       getBookByIdRateLimit:
-        limitForPeriod: 100
-        limitRefreshPeriod: 1s
-        timeoutDuration: 0ms
+        baseConfig: default
       updateBookRateLimit:
-        limitForPeriod: 100
-        limitRefreshPeriod: 1s
-        timeoutDuration: 0ms
+        baseConfig: default
       deleteBookByIdRateLimit:
-        limitForPeriod: 100
-        limitRefreshPeriod: 1s
-        timeoutDuration: 0ms
+        baseConfig: default

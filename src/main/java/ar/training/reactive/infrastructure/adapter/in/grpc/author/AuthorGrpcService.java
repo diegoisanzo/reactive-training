@@ -3,6 +3,7 @@ package ar.training.reactive.infrastructure.adapter.in.grpc.author;
 import ar.training.reactive.AuthorGrpcServiceGrpc;
 import ar.training.reactive.AuthorListProto;
 import ar.training.reactive.application.port.in.author.GetAllAuthorsInboundPort;
+import ar.training.reactive.infrastructure.adapter.in.grpc.GrpcReactiveStream;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
@@ -25,19 +26,10 @@ public class AuthorGrpcService extends AuthorGrpcServiceGrpc.AuthorGrpcServiceIm
 
     public void getAllAuthors(Empty empty, StreamObserver<AuthorListProto> responseObserver) {
         logger.info("AuthorGrpcService::getAllAuthors()");
-        AuthorListProto.Builder AuthorListProtoBuilder = AuthorListProto.newBuilder();
-        getAllAuthorsInboundPort.getAllAuthors()
-                .map(grpcAuthorProtoMapper::toAuthorProto)
-                .subscribe(
-                    AuthorListProtoBuilder::addAuthors,
-                    responseObserver::onError,
-                    () -> {
-                         var AuthorListProto = AuthorListProtoBuilder.build();
-                         responseObserver.onNext(AuthorListProto);
-                         responseObserver.onCompleted();
-                    }
-                );
+        GrpcReactiveStream.collect(
+                getAllAuthorsInboundPort.getAllAuthors().map(grpcAuthorProtoMapper::toAuthorProto),
+                responseObserver,
+                authors -> AuthorListProto.newBuilder().addAllAuthors(authors).build()
+        );
     }
-
-
 }
