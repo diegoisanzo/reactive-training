@@ -75,3 +75,4 @@ out/
 ### Antigravity CLI ###
 .antigravitycli/
 
+.mcp.json
