@@ -31,6 +31,7 @@ CODY.md
 QODO.md
 # local code review files
 CODE_REVIEW*.md
+PLAN*.md
 
 .gradle
 build/
