@@ -16,39 +16,64 @@ spring:
 resilience4j:
   timelimiter:
     configs:
-      default:
+      defaultTimeLimitingConfig:
         timeoutDuration: 2s
         cancelRunningFuture: true
     instances:
       createBookTimeout:
-        baseConfig: default
+        baseConfig: defaultTimeLimitingConfig
         timeoutDuration: 2s
       getBookByIdTimeout:
-        baseConfig: default
+        baseConfig: defaultTimeLimitingConfig
         timeoutDuration: 1s
       getAllBooksTimeout:
-        baseConfig: default
+        baseConfig: defaultTimeLimitingConfig
         timeoutDuration: 3s
       updateBookTimeout:
-        baseConfig: default
+        baseConfig: defaultTimeLimitingConfig
         timeoutDuration: 2s
       deleteBookByIdTimeout:
-        baseConfig: default
+        baseConfig: defaultTimeLimitingConfig
+        timeoutDuration: 1s
+      createAuthorTimeout:
+        baseConfig: defaultTimeLimitingConfig
+        timeoutDuration: 2s
+      getAuthorByIdTimeout:
+        baseConfig: defaultTimeLimitingConfig
+        timeoutDuration: 1s
+      getAllAuthorsTimeout:
+        baseConfig: defaultTimeLimitingConfig
+        timeoutDuration: 3s
+      updateAuthorTimeout:
+        baseConfig: defaultTimeLimitingConfig
+        timeoutDuration: 2s
+      deleteAuthorByIdTimeout:
+        baseConfig: defaultTimeLimitingConfig
         timeoutDuration: 1s
   ratelimiter:
     configs:
-      default:
+      defaultRateLimitingConfig:
         limitForPeriod: 100
         limitRefreshPeriod: 1s
         timeoutDuration: 0ms
     instances:
       createBookRateLimit:
-        baseConfig: default
+        baseConfig: defaultRateLimitingConfig
       getAllBooksRateLimit:
-        baseConfig: default
+        baseConfig: defaultRateLimitingConfig
       getBookByIdRateLimit:
-        baseConfig: default
+        baseConfig: defaultRateLimitingConfig
       updateBookRateLimit:
-        baseConfig: default
+        baseConfig: defaultRateLimitingConfig
       deleteBookByIdRateLimit:
-        baseConfig: default
+        baseConfig: defaultRateLimitingConfig
+      createAuthorRateLimit:
+        baseConfig: defaultRateLimitingConfig
+      getAllAuthorsRateLimit:
+        baseConfig: defaultRateLimitingConfig
+      getAuthorByIdRateLimit:
+        baseConfig: defaultRateLimitingConfig
+      updateAuthorRateLimit:
+        baseConfig: defaultRateLimitingConfig
+      deleteAuthorByIdRateLimit:
+        baseConfig: defaultRateLimitingConfig

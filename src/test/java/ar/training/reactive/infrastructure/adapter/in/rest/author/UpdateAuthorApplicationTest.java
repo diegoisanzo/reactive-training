@@ -1,6 +1,10 @@
 package ar.training.reactive.infrastructure.adapter.in.rest.author;
 
 import ar.training.reactive.SharedContainers;
+import ar.training.reactive.application.port.in.author.UpdateAuthorInboundPort;
+import ar.training.reactive.domain.model.Author;
+import ar.training.reactive.fixture.author.AuthorDtoFixture;
+import ar.training.reactive.fixture.author.AuthorFixture;
 import ar.training.reactive.fixture.author.CreateAuthorDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
@@ -10,18 +14,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.http.ProblemDetail;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorApplicationTestHelper.createAuthor;
 import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController.AUTHOR_PATH;
+import static java.time.temporal.ChronoUnit.MILLIS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
 class UpdateAuthorApplicationTest extends BaseApplicationTest {
+
+    @MockitoSpyBean
+    private UpdateAuthorInboundPort updateAuthorInboundPort;
 
     @Autowired
     UpdateAuthorApplicationTest(WebTestClient webTestClient, TestDataSetup testDataSetup, JwtService jwtService) {
@@ -70,5 +84,19 @@ class UpdateAuthorApplicationTest extends BaseApplicationTest {
     void shouldReturn400WhenUpdatingAuthorWithBlankName() {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
         assertBadRequestOnPut(AUTHOR_PATH, new AuthorDto(created.id(), "   "));
+    }
+
+    @Test
+    void shouldFailToUpdateAuthorWhenExceedingTimeLimit() {
+        doAnswer(_ -> Mono.delay(Duration.of(2200, MILLIS)).then(Mono.just(AuthorFixture.withDefaults())))
+            .when(updateAuthorInboundPort)
+            .updateAuthor(any(Author.class));
+        authedReadWriteUserClient().put()
+                .uri(AUTHOR_PATH)
+                .bodyValue(AuthorDtoFixture.withDefaults())
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody(ProblemDetail.class)
+                .value(pd -> assertInternalServerError(pd, AUTHOR_PATH));
     }
 }
