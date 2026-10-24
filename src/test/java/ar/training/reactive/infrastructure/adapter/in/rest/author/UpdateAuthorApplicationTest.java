@@ -87,6 +87,13 @@ class UpdateAuthorApplicationTest extends BaseApplicationTest {
     }
 
     @Test
+    void shouldReturn400WhenUpdatingAuthorWithNameExceedingMaxLength() {
+        var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
+        var longName = "a".repeat(Author.NAME_MAX_LENGTH + 1);
+        assertBadRequestOnPut(AUTHOR_PATH, new AuthorDto(created.id(), longName));
+    }
+
+    @Test
     void shouldFailToUpdateAuthorWhenExceedingTimeLimit() {
         doAnswer(_ -> Mono.delay(Duration.of(2200, MILLIS)).then(Mono.just(AuthorFixture.withDefaults())))
             .when(updateAuthorInboundPort)

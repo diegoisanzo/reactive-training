@@ -94,6 +94,24 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
     }
 
     @Test
+    void shouldReturn400WhenCreatingAuthorWithNameExceedingMaxLength() {
+        var longName = "a".repeat(Author.NAME_MAX_LENGTH + 1);
+        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto(longName));
+    }
+
+    @Test
+    void shouldCreateAuthorWithNameOfExactlyMaxLength() {
+        var maxLengthName = "a".repeat(Author.NAME_MAX_LENGTH);
+        authedReadWriteUserClient().post()
+                .uri(AUTHOR_PATH)
+                .bodyValue(new CreateAuthorDto(maxLengthName))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(AuthorDto.class)
+                .value(created -> assertEquals(maxLengthName, created.name()));
+    }
+
+    @Test
     void shouldFailToCreateAuthorWhenExceedingTimeLimit() {
         doAnswer(_ -> Mono.delay(Duration.of(2200, MILLIS)).then(Mono.just(AuthorFixture.withDefaults())))
             .when(createAuthorInboundPort)

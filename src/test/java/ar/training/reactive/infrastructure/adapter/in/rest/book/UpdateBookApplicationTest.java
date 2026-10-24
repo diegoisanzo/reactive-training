@@ -100,7 +100,7 @@ class UpdateBookApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturn400WhenUpdatingBookWithTitleExceedingMaxLength() {
-        var longTitle = "a".repeat(256);
+        var longTitle = "a".repeat(Book.TITLE_MAX_LENGTH + 1);
         var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle, 0, Genre.FICTION, AUTHOR_ID);
         assertBadRequestOnPut(BOOK_PATH, invalidDto);
     }

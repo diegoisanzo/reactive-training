@@ -5,6 +5,8 @@ import java.util.UUID;
 
 public final class Author {
 
+    public static final int NAME_MAX_LENGTH = 255;
+
     private UUID id;
     private String name;
 

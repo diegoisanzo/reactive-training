@@ -1,5 +1,6 @@
 package ar.training.reactive.infrastructure.adapter.in.rest.book;
 
+import ar.training.reactive.domain.model.Book;
 import ar.training.reactive.domain.model.Genre;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +20,7 @@ public record BookDto(
 
     @NotNull(message = "title must not be null")
     @NotEmpty(message = "title must not be empty")
-    @Size(max = 255, message = "title must not exceed 255 characters")
+    @Size(max = Book.TITLE_MAX_LENGTH, message = "title must not exceed " + Book.TITLE_MAX_LENGTH + " characters")
     String title,
 
     @PositiveOrZero(message = "availableCopies must be zero or positive")

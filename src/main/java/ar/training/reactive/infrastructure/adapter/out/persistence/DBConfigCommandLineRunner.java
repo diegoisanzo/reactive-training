@@ -94,12 +94,12 @@ public class DBConfigCommandLineRunner {
             CREATE TABLE IF NOT EXISTS book (
                 id UUID PRIMARY KEY,
                 isbn VARCHAR(13) NOT NULL,
-                title VARCHAR(255) NOT NULL,
+                title VARCHAR(%d) NOT NULL,
                 available_copies BIGINT NOT NULL DEFAULT 0,
                 genre VARCHAR(50) NOT NULL,
                 author_id UUID NOT NULL REFERENCES author(id)
             );
-        """)
+        """.formatted(Book.TITLE_MAX_LENGTH))
                 .then()
                 .doOnSuccess(v -> log.info("Table 'book' verified/created."))
                 .doOnError(e -> log.error("Error creating table", e));
@@ -109,9 +109,9 @@ public class DBConfigCommandLineRunner {
         return client.sql("""
             CREATE TABLE IF NOT EXISTS author (
                 id UUID PRIMARY KEY,
-                name VARCHAR(255) NOT NULL
+                name VARCHAR(%d) NOT NULL
             );
-        """)
+        """.formatted(Author.NAME_MAX_LENGTH))
                 .then()
                 .doOnSuccess(v -> log.info("Table 'author' verified/created."))
                 .doOnError(e -> log.error("Error creating table", e));

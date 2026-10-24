@@ -121,7 +121,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingBookWithTitleExceedingMaxLength() {
-        var longTitle = "a".repeat(256);
+        var longTitle = "a".repeat(Book.TITLE_MAX_LENGTH + 1);
         var invalidDto = new CreateBookDto("9780000000000", longTitle, 0, Genre.FICTION, AUTHOR_ID);
         assertBadRequestOnPost(BOOK_PATH, invalidDto);
     }
