@@ -1,6 +1,7 @@
 package ar.training.reactive.infrastructure.adapter.in.rest.author;
 
 import ar.training.reactive.SharedContainers;
+import ar.training.reactive.application.port.in.author.DeleteAuthorByIdInboundPort;
 import ar.training.reactive.domain.model.Genre;
 import ar.training.reactive.fixture.author.CreateAuthorDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
@@ -14,20 +15,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.ProblemDetail;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorApplicationTestHelper.createAuthor;
 import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController.AUTHOR_BY_ID_PATH;
+import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController.AUTHOR_PATH;
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
 class DeleteAuthorApplicationTest extends BaseApplicationTest {
+
+    @MockitoSpyBean
+    private DeleteAuthorByIdInboundPort deleteAuthorByIdInboundPort;
 
     @Autowired
     DeleteAuthorApplicationTest(WebTestClient webTestClient, TestDataSetup testDataSetup, JwtService jwtService) {
@@ -66,5 +77,19 @@ class DeleteAuthorApplicationTest extends BaseApplicationTest {
                     assertEquals(409, pd.getStatus());
                     assertEquals("Author with id " + author.id() + " has associated books", pd.getDetail());
                 });
+    }
+
+    @Test
+    void shouldFailToDeleteAuthorWhenExceedingTimeLimit() {
+        var id = UUID.randomUUID();
+        doAnswer(_ -> Mono.delay(Duration.of(1200, MILLIS)).then())
+            .when(deleteAuthorByIdInboundPort)
+            .deleteAuthorById(any(UUID.class));
+        authedAdminUserClient().delete()
+                .uri(AUTHOR_BY_ID_PATH, id)
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody(ProblemDetail.class)
+                .value(pd -> assertInternalServerError(pd, AUTHOR_PATH + "/" + id));
     }
 }

@@ -5,6 +5,8 @@ import ar.training.reactive.application.port.in.author.DeleteAuthorByIdInboundPo
 import ar.training.reactive.application.port.in.author.GetAllAuthorsInboundPort;
 import ar.training.reactive.application.port.in.author.GetAuthorByIdInboundPort;
 import ar.training.reactive.application.port.in.author.UpdateAuthorInboundPort;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,8 @@ public class AuthorController {
     }
 
     @PostMapping(AUTHOR_PATH)
+    @TimeLimiter(name = "createAuthorTimeout")
+    @RateLimiter(name = "createAuthorRateLimit")
     public Mono<ResponseEntity<AuthorDto>> createAuthor(@Valid @RequestBody CreateAuthorDto createAuthorDto) {
         logger.info("AuthorController::createAuthor()");
         return createAuthorInboundPort.createAuthor(restAuthorMapper.toAuthor(createAuthorDto))
@@ -62,6 +66,8 @@ public class AuthorController {
     }
 
     @GetMapping(AUTHOR_PATH)
+    @TimeLimiter(name = "getAllAuthorsTimeout")
+    @RateLimiter(name = "getAllAuthorsRateLimit")
     public Flux<AuthorDto> getAllAuthors() {
         logger.info("AuthorController::getAllAuthors()");
         return getAllAuthorsInboundPort.getAllAuthors()
@@ -69,6 +75,8 @@ public class AuthorController {
     }
 
     @GetMapping(AUTHOR_BY_ID_PATH)
+    @TimeLimiter(name = "getAuthorByIdTimeout")
+    @RateLimiter(name = "getAuthorByIdRateLimit")
     public Mono<ResponseEntity<AuthorDto>> getAuthorById(@PathVariable UUID id) {
         logger.info("AuthorController::getAuthorById({})", id);
         return getAuthorByIdInboundPort.getAuthorById(id)
@@ -77,6 +85,8 @@ public class AuthorController {
     }
 
     @PutMapping(AUTHOR_PATH)
+    @TimeLimiter(name = "updateAuthorTimeout")
+    @RateLimiter(name = "updateAuthorRateLimit")
     public Mono<ResponseEntity<AuthorDto>> updateAuthor(@Valid @RequestBody AuthorDto authorDto) {
         logger.info("AuthorController::updateAuthor({})", authorDto);
         return updateAuthorInboundPort.updateAuthor(restAuthorMapper.toAuthor(authorDto))
@@ -85,6 +95,8 @@ public class AuthorController {
     }
 
     @DeleteMapping(AUTHOR_BY_ID_PATH)
+    @TimeLimiter(name = "deleteAuthorByIdTimeout")
+    @RateLimiter(name = "deleteAuthorByIdRateLimit")
     public Mono<ResponseEntity<Void>> deleteAuthorById(@PathVariable UUID id) {
         logger.info("AuthorController::deleteAuthorById({})", id);
         return deleteAuthorByIdInboundPort.deleteAuthorById(id)

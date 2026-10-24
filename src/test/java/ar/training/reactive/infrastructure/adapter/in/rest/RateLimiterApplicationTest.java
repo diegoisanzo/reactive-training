@@ -1,8 +1,11 @@
 package ar.training.reactive.infrastructure.adapter.in.rest;
 
 import ar.training.reactive.SharedContainers;
+import ar.training.reactive.fixture.author.CreateAuthorDtoFixture;
 import ar.training.reactive.fixture.book.BookDtoFixture;
 import ar.training.reactive.fixture.book.CreateBookDtoFixture;
+import ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorDto;
+import ar.training.reactive.infrastructure.adapter.out.persistence.author.AuthorDBData;
 import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +15,22 @@ import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTest
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.UUID;
+
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.CREATE_AUTHOR_RATE_LIMIT;
 import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.CREATE_BOOK_RATE_LIMIT;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.DELETE_AUTHOR_BY_ID_RATE_LIMIT;
 import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.DELETE_BOOK_BY_ID_RATE_LIMIT;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.GET_ALL_AUTHORS_RATE_LIMIT;
 import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.GET_ALL_BOOKS_RATE_LIMIT;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.GET_AUTHOR_BY_ID_RATE_LIMIT;
 import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.GET_BOOK_BY_ID_RATE_LIMIT;
 import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.LIMIT_FOR_PERIOD;
 import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.LIMIT_REFRESH_PERIOD;
+import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.UPDATE_AUTHOR_RATE_LIMIT;
 import static ar.training.reactive.infrastructure.adapter.in.rest.RateLimiterApplicationTest.TestProperties.UPDATE_BOOK_RATE_LIMIT;
+import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController.AUTHOR_BY_ID_PATH;
+import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController.AUTHOR_PATH;
 import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_BY_ID_PATH;
 import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +53,21 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
         DELETE_BOOK_BY_ID_RATE_LIMIT + LIMIT_FOR_PERIOD,
         DELETE_BOOK_BY_ID_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        CREATE_AUTHOR_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        CREATE_AUTHOR_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        GET_ALL_AUTHORS_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        GET_ALL_AUTHORS_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        GET_AUTHOR_BY_ID_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        GET_AUTHOR_BY_ID_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        UPDATE_AUTHOR_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        UPDATE_AUTHOR_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
+
+        DELETE_AUTHOR_BY_ID_RATE_LIMIT + LIMIT_FOR_PERIOD,
+        DELETE_AUTHOR_BY_ID_RATE_LIMIT + LIMIT_REFRESH_PERIOD,
 })
 @ImportTestcontainers(SharedContainers.class)
 @AutoConfigureWebTestClient
@@ -54,6 +81,12 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
         String GET_BOOK_BY_ID_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "getBookByIdRateLimit.";
         String UPDATE_BOOK_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "updateBookRateLimit.";
         String DELETE_BOOK_BY_ID_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "deleteBookByIdRateLimit.";
+
+        String CREATE_AUTHOR_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "createAuthorRateLimit.";
+        String GET_ALL_AUTHORS_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "getAllAuthorsRateLimit.";
+        String GET_AUTHOR_BY_ID_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "getAuthorByIdRateLimit.";
+        String UPDATE_AUTHOR_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "updateAuthorRateLimit.";
+        String DELETE_AUTHOR_BY_ID_RATE_LIMIT = RESILIENCE4J_RATELIMITER_INSTANCES + "deleteAuthorByIdRateLimit.";
 
         String LIMIT_FOR_PERIOD = "limitForPeriod=1";
         String LIMIT_REFRESH_PERIOD = "limitRefreshPeriod=10s";
@@ -98,6 +131,43 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
         var id = BookDtoFixture.withDefaults().id();
         var request = authedAdminUserClient().delete().uri(BOOK_BY_ID_PATH, id);
         request.exchange().expectStatus().isNoContent();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
+    }
+
+    @Test
+    void shouldReturn429ForGetAllAuthorsWhenRateLimitExceeded() {
+        var request = authedReadUserClient().get().uri(AUTHOR_PATH);
+        request.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
+    }
+
+    @Test
+    void shouldReturn429ForGetAuthorByIdWhenRateLimitExceeded() {
+        var id = AuthorDBData.ROBERT_MARTIN.getId();
+        var request = authedReadUserClient().get().uri(AUTHOR_BY_ID_PATH, id);
+        request.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
+    }
+
+    @Test
+    void shouldReturn429ForCreateAuthorWhenRateLimitExceeded() {
+        var request = authedReadWriteUserClient().post().uri(AUTHOR_PATH).bodyValue(CreateAuthorDtoFixture.withDefaults());
+        request.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
+    }
+
+    @Test
+    void shouldReturn429ForUpdateAuthorWhenRateLimitExceeded() {
+        var updated = new AuthorDto(AuthorDBData.ROBERT_MARTIN.getId(), "Updated Name");
+        var request = authedReadWriteUserClient().put().uri(AUTHOR_PATH).bodyValue(updated);
+        request.exchange().expectStatus().isOk();
+        assertIsStatus429AndRateLimitExceeded(request.exchange());
+    }
+
+    @Test
+    void shouldReturn429ForDeleteAuthorWhenRateLimitExceeded() {
+        var request = authedAdminUserClient().delete().uri(AUTHOR_BY_ID_PATH, UUID.randomUUID());
+        request.exchange().expectStatus().isNotFound();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 

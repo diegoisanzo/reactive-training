@@ -1,0 +1,10 @@
+spring:
+  r2dbc:
+    # Each cached Spring test context opens its own R2DBC pool. With the default
+    # size (10) and many distinct contexts, the shared Postgres container hits its
+    # max_connections limit (100) and fails with "too many clients already".
+    # A smaller pool keeps the total below that limit. initial-size must not
+    # exceed max-size.
+    pool:
+      initial-size: 1
+      max-size: 3

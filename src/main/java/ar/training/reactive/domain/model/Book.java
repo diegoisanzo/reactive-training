@@ -5,6 +5,8 @@ import java.util.UUID;
 
 public final class Book {
 
+    public static final int TITLE_MAX_LENGTH = 255;
+
     private UUID id;
     private String isbn;
     private String title;
