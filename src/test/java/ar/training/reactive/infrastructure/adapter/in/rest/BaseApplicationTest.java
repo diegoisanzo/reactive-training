@@ -10,10 +10,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class BaseApplicationTest {
+
+    private static final Object[] EMPTY_URI_VARS = new Object[0];
+    private static final Pattern REQUEST_ID_PATTERN = Pattern.compile("^[a-fA-F0-9]+-\\d+$");
 
     protected final WebTestClient webTestClient;
     protected final TestDataSetup testDataSetup;
@@ -50,7 +54,7 @@ public abstract class BaseApplicationTest {
     }
 
     protected WebTestClient.RequestBodySpec authedPost(String path) {
-        return authedReadWriteUserClient().post().uri(path);
+        return authedPost(path, EMPTY_URI_VARS);
     }
 
     protected WebTestClient.RequestBodySpec authedPost(String path, Object... uriVariables) {
@@ -58,7 +62,7 @@ public abstract class BaseApplicationTest {
     }
 
     protected WebTestClient.RequestBodySpec authedPut(String path) {
-        return authedReadWriteUserClient().put().uri(path);
+        return authedPut(path, EMPTY_URI_VARS);
     }
 
     protected WebTestClient.RequestBodySpec authedPut(String path, Object... uriVariables) {
@@ -66,7 +70,7 @@ public abstract class BaseApplicationTest {
     }
 
     protected WebTestClient.RequestHeadersSpec<?> authedGet(String path) {
-        return authedReadUserClient().get().uri(path);
+        return authedGet(path, EMPTY_URI_VARS);
     }
 
     protected WebTestClient.RequestHeadersSpec<?> authedGet(String path, Object... uriVariables) {
@@ -74,7 +78,7 @@ public abstract class BaseApplicationTest {
     }
 
     protected WebTestClient.RequestHeadersSpec<?> authedAdminDelete(String path) {
-        return authedAdminUserClient().delete().uri(path);
+        return authedAdminDelete(path, EMPTY_URI_VARS);
     }
 
     protected WebTestClient.RequestHeadersSpec<?> authedAdminDelete(String path, Object... uriVariables) {
@@ -113,30 +117,40 @@ public abstract class BaseApplicationTest {
         request.exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ProblemDetail.class)
-                .value(problemDetail -> {
-                    assertNotNull(problemDetail);
-                    assertEquals(400, problemDetail.getStatus());
-                    assertEquals("Validation Failed", problemDetail.getTitle());
-                    assertEquals("Input validation failed", problemDetail.getDetail());
-                    assertEquals(URI.create(path), problemDetail.getInstance());
+                .value(problemDetail -> assertValidationProblemDetail(problemDetail, path, expectedFieldErrors));
+    }
 
-                    var properties = problemDetail.getProperties();
-                    assertNotNull(properties, "ProblemDetail properties should not be null");
-                    @SuppressWarnings("unchecked")
-                    var fieldErrors = (List<Map<String, Object>>) properties.get("fieldErrors");
-                    assertNotNull(fieldErrors, "fieldErrors should not be null");
+    private static void assertValidationProblemDetail(ProblemDetail problemDetail, String path, Map<String, String> expectedFieldErrors) {
+        assertNotNull(problemDetail);
+        assertEquals(400, problemDetail.getStatus());
+        assertEquals("Validation Failed", problemDetail.getTitle());
+        assertEquals("Input validation failed", problemDetail.getDetail());
+        assertEquals(URI.create(path), problemDetail.getInstance());
 
-                    expectedFieldErrors.forEach((field, message) -> {
-                        boolean match = fieldErrors.stream().anyMatch(error ->
-                                field.equals(error.get("field")) &&
-                                message.equals(error.get("message"))
-                        );
-                        assertTrue(match, () -> String.format(
-                                "Expected fieldError with field='%s' and message='%s', but got: %s",
-                                field, message, fieldErrors
-                        ));
-                    });
-                });
+        var fieldErrors = extractFieldErrors(problemDetail);
+        assertFieldErrorsMatch(fieldErrors, expectedFieldErrors);
+    }
+
+    private static List<Map<String, Object>> extractFieldErrors(ProblemDetail problemDetail) {
+        var properties = problemDetail.getProperties();
+        assertNotNull(properties, "ProblemDetail properties should not be null");
+        @SuppressWarnings("unchecked")
+        var fieldErrors = (List<Map<String, Object>>) properties.get("fieldErrors");
+        assertNotNull(fieldErrors, "fieldErrors should not be null");
+        return fieldErrors;
+    }
+
+    private static void assertFieldErrorsMatch(List<Map<String, Object>> fieldErrors, Map<String, String> expectedFieldErrors) {
+        expectedFieldErrors.forEach((field, message) -> {
+            boolean match = fieldErrors.stream().anyMatch(error ->
+                    field.equals(error.get("field")) &&
+                    message.equals(error.get("message"))
+            );
+            assertTrue(match, () -> String.format(
+                    "Expected fieldError with field='%s' and message='%s', but got: %s",
+                    field, message, fieldErrors
+            ));
+        });
     }
 
     protected static void assertUnauthorized(ProblemDetail problemDetail, String path) {
@@ -159,10 +173,15 @@ public abstract class BaseApplicationTest {
         assertEquals(path, properties.get("path"));
         assertEquals(error, properties.get("error"));
         assertNotNull(properties.get("timestamp"));
+        assertValidRequestId(properties);
+    }
+
+    private static void assertValidRequestId(Map<String, Object> properties) {
         assertTrue(properties.containsKey("requestId"), "Should contain requestId key");
         var requestIdValue = properties.get("requestId");
         assertNotNull(requestIdValue, "requestId value should not be null");
         assertInstanceOf(String.class, requestIdValue, "requestId should be a String");
-        assertFalse(((String) requestIdValue).isBlank(), "requestId should not be blank");
+        assertTrue(REQUEST_ID_PATTERN.matcher((String) requestIdValue).matches(),
+                () -> String.format("requestId '%s' should match pattern '%s'", requestIdValue, REQUEST_ID_PATTERN.pattern()));
     }
 }
