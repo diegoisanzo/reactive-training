@@ -49,26 +49,25 @@ class DeleteAuthorApplicationTest extends BaseApplicationTest {
     void shouldDeleteAuthor() {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
 
-        authedAdminUserClient().delete().uri(AUTHOR_BY_ID_PATH, created.id()).exchange()
+        authedAdminDelete(AUTHOR_BY_ID_PATH, created.id()).exchange()
                 .expectStatus().isNoContent();
     }
 
     @Test
     void shouldReturn404WhenDeletingNonExistentAuthor() {
-        authedAdminUserClient().delete().uri(AUTHOR_BY_ID_PATH, UUID.randomUUID()).exchange()
+        authedAdminDelete(AUTHOR_BY_ID_PATH, UUID.randomUUID()).exchange()
                 .expectStatus().isNotFound();
     }
 
     @Test
     void shouldReturn409WhenDeletingAuthorWithAssociatedBooks() {
         var author = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
-        authedReadWriteUserClient().post()
-                .uri(BookController.BOOK_PATH)
+        authedPost(BookController.BOOK_PATH)
                 .bodyValue(new CreateBookDto("1780132350999", "Some Book", 1, Genre.FICTION, author.id()))
                 .exchange()
                 .expectStatus().isOk();
 
-        authedAdminUserClient().delete().uri(AUTHOR_BY_ID_PATH, author.id()).exchange()
+        authedAdminDelete(AUTHOR_BY_ID_PATH, author.id()).exchange()
                 .expectStatus().isEqualTo(409)
                 .expectBody(ProblemDetail.class)
                 .value(pd -> {
@@ -85,8 +84,7 @@ class DeleteAuthorApplicationTest extends BaseApplicationTest {
         doAnswer(_ -> Mono.delay(Duration.of(1200, MILLIS)).then())
             .when(deleteAuthorByIdInboundPort)
             .deleteAuthorById(any(UUID.class));
-        authedAdminUserClient().delete()
-                .uri(AUTHOR_BY_ID_PATH, id)
+        authedAdminDelete(AUTHOR_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody(ProblemDetail.class)

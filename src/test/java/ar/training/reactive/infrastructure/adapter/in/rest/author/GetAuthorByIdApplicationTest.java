@@ -46,8 +46,7 @@ class GetAuthorByIdApplicationTest extends BaseApplicationTest {
     void shouldReturnAuthorById() {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
 
-        authedReadUserClient().get()
-                .uri(AUTHOR_BY_ID_PATH, created.id())
+        authedGet(AUTHOR_BY_ID_PATH, created.id())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(AuthorDto.class)
@@ -58,8 +57,7 @@ class GetAuthorByIdApplicationTest extends BaseApplicationTest {
     void shouldReturn404WhenAuthorNotFoundById() {
         var id = UUID.randomUUID();
 
-        authedReadUserClient().get()
-                .uri(AUTHOR_BY_ID_PATH, id)
+        authedGet(AUTHOR_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ProblemDetail.class)
@@ -75,8 +73,7 @@ class GetAuthorByIdApplicationTest extends BaseApplicationTest {
         doAnswer(_ -> Mono.delay(Duration.of(1200, MILLIS)).then(Mono.just(AuthorFixture.withDefaults())))
             .when(getAuthorByIdInboundPort)
             .getAuthorById(any(UUID.class));
-        authedReadUserClient().get()
-                .uri(AUTHOR_BY_ID_PATH, id)
+        authedGet(AUTHOR_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody(ProblemDetail.class)

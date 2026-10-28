@@ -41,13 +41,13 @@ class DeleteBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldDeleteBook() {
         var id = BookDtoFixture.withDefaults().id();
-        authedAdminUserClient().delete().uri(BOOK_BY_ID_PATH, id).exchange()
+        authedAdminDelete(BOOK_BY_ID_PATH, id).exchange()
                 .expectStatus().isNoContent();
     }
 
     @Test
     void shouldReturn404WhenDeletingNonExistentBook() {
-        authedAdminUserClient().delete().uri(BOOK_BY_ID_PATH, UUID.randomUUID()).exchange()
+        authedAdminDelete(BOOK_BY_ID_PATH, UUID.randomUUID()).exchange()
                 .expectStatus().isNotFound();
     }
 
@@ -57,8 +57,7 @@ class DeleteBookApplicationTest extends BaseApplicationTest {
         doAnswer(_ -> Mono.delay(Duration.of(1200, MILLIS)).then(Mono.empty()))
             .when(deleteBookByIdInboundPort)
             .deleteBookById(any(UUID.class));
-        authedAdminUserClient().delete()
-                .uri(BOOK_BY_ID_PATH, id)
+        authedAdminDelete(BOOK_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody(ProblemDetail.class)

@@ -40,8 +40,7 @@ class GetAllBooksApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturnAllBooks() {
-        authedReadUserClient().get()
-                .uri(BOOK_PATH)
+        authedGet(BOOK_PATH)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(BookDto.class)
@@ -54,8 +53,7 @@ class GetAllBooksApplicationTest extends BaseApplicationTest {
         doAnswer(_ -> Mono.delay(Duration.of(3200, MILLIS)).thenMany(Flux.<Book>empty()))
             .when(getAllBooksInboundPort)
             .getAllBooks();
-        authedReadUserClient().get()
-                .uri(BOOK_PATH)
+        authedGet(BOOK_PATH)
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody(ProblemDetail.class)

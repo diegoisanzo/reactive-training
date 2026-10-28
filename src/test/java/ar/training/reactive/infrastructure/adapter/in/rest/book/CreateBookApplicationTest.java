@@ -50,8 +50,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldCreateBook() {
         var createBookDto = CreateBookDtoFixture.withDefaults();
-        authedReadWriteUserClient().post()
-                .uri(BOOK_PATH)
+        authedPost(BOOK_PATH)
                 .bodyValue(createBookDto)
                 .exchange()
                 .expectStatus().isOk()
@@ -70,8 +69,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldPersistCreatedBookWhenFetchedAgain() {
         var createBookDto = CreateBookDtoFixture.withDefaults();
-        var created = authedReadWriteUserClient().post()
-                .uri(BOOK_PATH)
+        var created = authedPost(BOOK_PATH)
                 .bodyValue(createBookDto)
                 .exchange()
                 .expectStatus().isOk()
@@ -81,8 +79,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
 
         assertNotNull(created);
 
-        authedReadUserClient().get()
-                .uri(BOOK_BY_ID_PATH, created.id())
+        authedGet(BOOK_BY_ID_PATH, created.id())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(BookDto.class)
@@ -92,38 +89,56 @@ class CreateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn400WhenCreatingBookWithNullIsbn() {
         var invalidDto = new CreateBookDto(null, "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPost(BOOK_PATH, invalidDto);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "isbn", "isbn must not be null");
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyIsbn() {
         var invalidDto = new CreateBookDto("", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPost(BOOK_PATH, invalidDto);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "isbn", "isbn must not be empty");
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithIsbnExceedingMaxLength() {
         var invalidDto = new CreateBookDto("12345678901234", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPost(BOOK_PATH, invalidDto);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "isbn", "isbn must not exceed 13 characters");
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithNullTitle() {
         var invalidDto = new CreateBookDto("9780000000000", null, 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPost(BOOK_PATH, invalidDto);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "title", "title must not be null");
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithEmptyTitle() {
         var invalidDto = new CreateBookDto("9780000000000", "", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPost(BOOK_PATH, invalidDto);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "title", "title must not be empty");
     }
 
     @Test
     void shouldReturn400WhenCreatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(Book.TITLE_MAX_LENGTH + 1);
         var invalidDto = new CreateBookDto("9780000000000", longTitle, 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPost(BOOK_PATH, invalidDto);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "title", "title must not exceed " + Book.TITLE_MAX_LENGTH + " characters");
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithNegativeAvailableCopies() {
+        var invalidDto = new CreateBookDto("9780000000000", "Valid Title", -1, Genre.FICTION, AUTHOR_ID);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "availableCopies", "availableCopies must be zero or positive");
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithNullGenre() {
+        var invalidDto = new CreateBookDto("9780000000000", "Valid Title", 0, null, AUTHOR_ID);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "genre", "genre must not be null");
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithNullAuthorId() {
+        var invalidDto = new CreateBookDto("9780000000000", "Valid Title", 0, Genre.FICTION, null);
+        assertBadRequestOnPost(BOOK_PATH, invalidDto, "authorId", "authorId must not be null");
     }
 
     @Test
@@ -135,8 +150,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
             .when(createBookInboundPort)
             .createBook(any(Book.class));
         var createBookDto = CreateBookDtoFixture.withDefaults();
-        authedReadWriteUserClient().post()
-                .uri(BOOK_PATH)
+        authedPost(BOOK_PATH)
                 .bodyValue(createBookDto)
                 .exchange()
                 .expectStatus().is5xxServerError()
@@ -153,8 +167,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
 
         var createBookDto = CreateBookDtoFixture.withDefaults();
 
-        authedReadWriteUserClient().post()
-                .uri(BOOK_PATH)
+        authedPost(BOOK_PATH)
                 .bodyValue(createBookDto)
                 .exchange()
                 .expectStatus().isEqualTo(org.springframework.http.HttpStatus.CONFLICT)

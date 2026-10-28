@@ -46,8 +46,7 @@ class GetBookByIdApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturnBookById() {
         var expected = BookDtoFixture.withDefaults();
-        authedReadUserClient().get()
-                .uri(BOOK_BY_ID_PATH, expected.id())
+        authedGet(BOOK_BY_ID_PATH, expected.id())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(BookDto.class)
@@ -61,8 +60,7 @@ class GetBookByIdApplicationTest extends BaseApplicationTest {
         expectedProblemDetail.setTitle("Book not found");
         expectedProblemDetail.setInstance(new URI(BOOK_BY_ID_PATH.replace("{id}", id.toString())));
 
-        authedReadUserClient().get()
-                .uri(BOOK_BY_ID_PATH, id)
+        authedGet(BOOK_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ProblemDetail.class)
@@ -75,8 +73,7 @@ class GetBookByIdApplicationTest extends BaseApplicationTest {
         doAnswer(_ -> Mono.delay(Duration.of(1200, MILLIS)).then(Mono.just(BookFixture.withDefaults())))
             .when(getBookByIdInboundPort)
             .getBookById(any(UUID.class));
-        authedReadUserClient().get()
-                .uri(BOOK_BY_ID_PATH, id)
+        authedGet(BOOK_BY_ID_PATH, id)
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody(ProblemDetail.class)

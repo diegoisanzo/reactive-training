@@ -43,8 +43,7 @@ class GetAllAuthorsApplicationTest extends BaseApplicationTest {
     void shouldReturnAllAuthors() {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
 
-        authedReadUserClient().get()
-                .uri(AUTHOR_PATH)
+        authedGet(AUTHOR_PATH)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(AuthorDto.class)
@@ -56,8 +55,7 @@ class GetAllAuthorsApplicationTest extends BaseApplicationTest {
         doAnswer(_ -> Mono.delay(Duration.of(3200, MILLIS)).thenMany(Flux.<Author>empty()))
             .when(getAllAuthorsInboundPort)
             .getAllAuthors();
-        authedReadUserClient().get()
-                .uri(AUTHOR_PATH)
+        authedGet(AUTHOR_PATH)
                 .exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody(ProblemDetail.class)

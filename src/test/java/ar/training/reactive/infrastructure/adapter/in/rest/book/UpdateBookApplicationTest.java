@@ -46,8 +46,7 @@ class UpdateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldUpdateBookViaHttp() {
         var updated = BookDtoFixture.withUpdatesToDefault();
-        authedReadWriteUserClient().put()
-                .uri(BOOK_PATH)
+        authedPut(BOOK_PATH)
                 .bodyValue(updated)
                 .exchange()
                 .expectStatus().isOk()
@@ -58,51 +57,69 @@ class UpdateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn404WhenUpdatingNonExistentBook() {
         var nonExistent = new BookDto(UUID.randomUUID(), "9780000000000", "Unknown", 0, Genre.FICTION, AUTHOR_ID);
-        authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(nonExistent).exchange()
+        authedPut(BOOK_PATH).bodyValue(nonExistent).exchange()
                 .expectStatus().isNotFound();
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullId() {
         var invalidDto = new BookDto(null, "9780000000000", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPut(BOOK_PATH, invalidDto);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "id", "id must not be null");
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullIsbn() {
         var invalidDto = new BookDto(UUID.randomUUID(), null, "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPut(BOOK_PATH, invalidDto);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "isbn", "isbn must not be null");
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithEmptyIsbn() {
         var invalidDto = new BookDto(UUID.randomUUID(), "", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPut(BOOK_PATH, invalidDto);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "isbn", "isbn must not be empty");
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithIsbnExceedingMaxLength() {
         var invalidDto = new BookDto(UUID.randomUUID(), "12345678901234", "Valid Title", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPut(BOOK_PATH, invalidDto);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "isbn", "isbn must not exceed 13 characters");
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithNullTitle() {
         var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", null, 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPut(BOOK_PATH, invalidDto);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "title", "title must not be null");
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithEmptyTitle() {
         var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "", 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPut(BOOK_PATH, invalidDto);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "title", "title must not be empty");
     }
 
     @Test
     void shouldReturn400WhenUpdatingBookWithTitleExceedingMaxLength() {
         var longTitle = "a".repeat(Book.TITLE_MAX_LENGTH + 1);
         var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle, 0, Genre.FICTION, AUTHOR_ID);
-        assertBadRequestOnPut(BOOK_PATH, invalidDto);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "title", "title must not exceed " + Book.TITLE_MAX_LENGTH + " characters");
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithNegativeAvailableCopies() {
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "Valid Title", -1, Genre.FICTION, AUTHOR_ID);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "availableCopies", "availableCopies must be zero or positive");
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithNullGenre() {
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "Valid Title", 0, null, AUTHOR_ID);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "genre", "genre must not be null");
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingBookWithNullAuthorId() {
+        var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", "Valid Title", 0, Genre.FICTION, null);
+        assertBadRequestOnPut(BOOK_PATH, invalidDto, "authorId", "authorId must not be null");
     }
 
     @Test
@@ -113,8 +130,7 @@ class UpdateBookApplicationTest extends BaseApplicationTest {
         )
             .when(updateBookInboundPort)
             .updateBook(any(Book.class));
-        authedReadWriteUserClient().put()
-                .uri(BOOK_PATH)
+        authedPut(BOOK_PATH)
                 .bodyValue(BookDtoFixture.withUpdatesToDefault())
                 .exchange()
                 .expectStatus().is5xxServerError()

@@ -45,8 +45,7 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
     @Test
     void shouldCreateAuthor() {
         var createAuthorDto = CreateAuthorDtoFixture.withDefaults();
-        authedReadWriteUserClient().post()
-                .uri(AUTHOR_PATH)
+        authedPost(AUTHOR_PATH)
                 .bodyValue(createAuthorDto)
                 .exchange()
                 .expectStatus().isOk()
@@ -61,8 +60,7 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
     @Test
     void shouldPersistCreatedAuthorWhenFetchedAgain() {
         var createAuthorDto = CreateAuthorDtoFixture.withDefaults();
-        var created = authedReadWriteUserClient().post()
-                .uri(AUTHOR_PATH)
+        var created = authedPost(AUTHOR_PATH)
                 .bodyValue(createAuthorDto)
                 .exchange()
                 .expectStatus().isOk()
@@ -70,8 +68,7 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
                 .returnResult()
                 .getResponseBody();
 
-        authedReadUserClient().get()
-                .uri(AUTHOR_BY_ID_PATH, created.id())
+        authedGet(AUTHOR_BY_ID_PATH, created.id())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(AuthorDto.class)
@@ -80,30 +77,29 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturn400WhenCreatingAuthorWithNullName() {
-        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto(null));
+        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto(null), "name", "name must not be blank");
     }
 
     @Test
     void shouldReturn400WhenCreatingAuthorWithEmptyName() {
-        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto(""));
+        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto(""), "name", "name must not be blank");
     }
 
     @Test
     void shouldReturn400WhenCreatingAuthorWithBlankName() {
-        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto("   "));
+        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto("   "), "name", "name must not be blank");
     }
 
     @Test
     void shouldReturn400WhenCreatingAuthorWithNameExceedingMaxLength() {
         var longName = "a".repeat(Author.NAME_MAX_LENGTH + 1);
-        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto(longName));
+        assertBadRequestOnPost(AUTHOR_PATH, new CreateAuthorDto(longName), "name", "name must not exceed " + Author.NAME_MAX_LENGTH + " characters");
     }
 
     @Test
     void shouldCreateAuthorWithNameOfExactlyMaxLength() {
         var maxLengthName = "a".repeat(Author.NAME_MAX_LENGTH);
-        authedReadWriteUserClient().post()
-                .uri(AUTHOR_PATH)
+        authedPost(AUTHOR_PATH)
                 .bodyValue(new CreateAuthorDto(maxLengthName))
                 .exchange()
                 .expectStatus().isOk()
@@ -116,8 +112,7 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
         doAnswer(_ -> Mono.delay(Duration.of(2200, MILLIS)).then(Mono.just(AuthorFixture.withDefaults())))
             .when(createAuthorInboundPort)
             .createAuthor(any(Author.class));
-        authedReadWriteUserClient().post()
-                .uri(AUTHOR_PATH)
+        authedPost(AUTHOR_PATH)
                 .bodyValue(CreateAuthorDtoFixture.withDefaults())
                 .exchange()
                 .expectStatus().is5xxServerError()

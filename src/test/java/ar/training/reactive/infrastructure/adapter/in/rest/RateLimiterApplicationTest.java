@@ -99,7 +99,7 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
 
     @Test
     void shouldReturn429ForGetAllBooksWhenRateLimitExceeded() {
-        var request = authedReadUserClient().get().uri(BOOK_PATH);
+        var request = authedGet(BOOK_PATH);
         request.exchange().expectStatus().isOk();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
@@ -107,21 +107,21 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn429ForGetBookByIdWhenRateLimitExceeded() {
         var id = BookDtoFixture.withDefaults().id();
-        var request = authedReadUserClient().get().uri(BOOK_BY_ID_PATH, id);
+        var request = authedGet(BOOK_BY_ID_PATH, id);
         request.exchange().expectStatus().isOk();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForCreateBookWhenRateLimitExceeded() {
-        var request = authedReadWriteUserClient().post().uri(BOOK_PATH).bodyValue(CreateBookDtoFixture.withDefaults());
+        var request = authedPost(BOOK_PATH).bodyValue(CreateBookDtoFixture.withDefaults());
         request.exchange().expectStatus().isOk();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForUpdateBookWhenRateLimitExceeded() {
-        var request = authedReadWriteUserClient().put().uri(BOOK_PATH).bodyValue(BookDtoFixture.withUpdatesToDefault());
+        var request = authedPut(BOOK_PATH).bodyValue(BookDtoFixture.withUpdatesToDefault());
         request.exchange().expectStatus().isOk();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
@@ -129,14 +129,14 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn429ForDeleteBookWhenRateLimitExceeded() {
         var id = BookDtoFixture.withDefaults().id();
-        var request = authedAdminUserClient().delete().uri(BOOK_BY_ID_PATH, id);
+        var request = authedAdminDelete(BOOK_BY_ID_PATH, id);
         request.exchange().expectStatus().isNoContent();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForGetAllAuthorsWhenRateLimitExceeded() {
-        var request = authedReadUserClient().get().uri(AUTHOR_PATH);
+        var request = authedGet(AUTHOR_PATH);
         request.exchange().expectStatus().isOk();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
@@ -144,14 +144,14 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn429ForGetAuthorByIdWhenRateLimitExceeded() {
         var id = AuthorDBData.ROBERT_MARTIN.getId();
-        var request = authedReadUserClient().get().uri(AUTHOR_BY_ID_PATH, id);
+        var request = authedGet(AUTHOR_BY_ID_PATH, id);
         request.exchange().expectStatus().isOk();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForCreateAuthorWhenRateLimitExceeded() {
-        var request = authedReadWriteUserClient().post().uri(AUTHOR_PATH).bodyValue(CreateAuthorDtoFixture.withDefaults());
+        var request = authedPost(AUTHOR_PATH).bodyValue(CreateAuthorDtoFixture.withDefaults());
         request.exchange().expectStatus().isOk();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
@@ -159,14 +159,14 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn429ForUpdateAuthorWhenRateLimitExceeded() {
         var updated = new AuthorDto(AuthorDBData.ROBERT_MARTIN.getId(), "Updated Name");
-        var request = authedReadWriteUserClient().put().uri(AUTHOR_PATH).bodyValue(updated);
+        var request = authedPut(AUTHOR_PATH).bodyValue(updated);
         request.exchange().expectStatus().isOk();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
     @Test
     void shouldReturn429ForDeleteAuthorWhenRateLimitExceeded() {
-        var request = authedAdminUserClient().delete().uri(AUTHOR_BY_ID_PATH, UUID.randomUUID());
+        var request = authedAdminDelete(AUTHOR_BY_ID_PATH, UUID.randomUUID());
         request.exchange().expectStatus().isNotFound();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }

@@ -14,11 +14,13 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
+import java.util.Map;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.auth.AuthController.LOGIN_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -83,7 +85,7 @@ class AuthApplicationTest extends BaseApplicationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ProblemDetail.class)
-                .value(AuthApplicationTest::assertBadRequestProblemDetail);
+                .value(pd -> assertBadRequestProblemDetail(pd, "username", "username must not be empty"));
     }
 
     @Test
@@ -95,14 +97,28 @@ class AuthApplicationTest extends BaseApplicationTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ProblemDetail.class)
-                .value(AuthApplicationTest::assertBadRequestProblemDetail);
+                .value(pd -> assertBadRequestProblemDetail(pd, "password", "password must not be empty"));
     }
 
-    private static void assertBadRequestProblemDetail(ProblemDetail pd) {
+    private static void assertBadRequestProblemDetail(ProblemDetail pd, String expectedField, String expectedMessage) {
         assertNotNull(pd);
         assertEquals(400, pd.getStatus());
         assertEquals("Validation Failed", pd.getTitle());
         assertEquals("Input validation failed", pd.getDetail());
+        var properties = pd.getProperties();
+        assertNotNull(properties, "ProblemDetail properties should not be null");
+        @SuppressWarnings("unchecked")
+        var fieldErrors = (List<Map<String, Object>>) properties.get("fieldErrors");
+        assertNotNull(fieldErrors, "fieldErrors should not be null");
+
+        boolean match = fieldErrors.stream().anyMatch(error ->
+                expectedField.equals(error.get("field")) &&
+                expectedMessage.equals(error.get("message"))
+        );
+        assertTrue(match, () -> String.format(
+                "Expected fieldError with field='%s' and message='%s', but got: %s",
+                expectedField, expectedMessage, fieldErrors
+        ));
     }
 
     private void assertSuccessfulLogin(String username, List<String> expectedRoles) {
