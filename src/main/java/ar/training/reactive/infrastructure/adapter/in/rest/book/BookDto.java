@@ -10,26 +10,26 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 public record BookDto(
-    @NotNull(message = "id must not be null")
+    @NotNull(message = "{common.id.NotNull.message}")
     UUID id,
 
-    @NotNull(message = "isbn must not be null")
-    @NotEmpty(message = "isbn must not be empty")
-    @Size(max = 13, message = "isbn must not exceed 13 characters")
+    @NotNull(message = "{book.isbn.NotNull.message}")
+    @NotEmpty(message = "{book.isbn.NotEmpty.message}")
+    @Size(max = 13, message = "{book.isbn.Size.message}")
     String isbn,
 
-    @NotNull(message = "title must not be null")
-    @NotEmpty(message = "title must not be empty")
-    @Size(max = Book.TITLE_MAX_LENGTH, message = "title must not exceed " + Book.TITLE_MAX_LENGTH + " characters")
+    @NotNull(message = "{book.title.NotNull.message}")
+    @NotEmpty(message = "{book.title.NotEmpty.message}")
+    @Size(max = Book.TITLE_MAX_LENGTH, message = "{book.title.Size.message}")
     String title,
 
-    @PositiveOrZero(message = "availableCopies must be zero or positive")
+    @PositiveOrZero(message = "{book.availableCopies.PositiveOrZero.message}")
     long availableCopies,
 
-    @NotNull(message = "genre must not be null")
+    @NotNull(message = "{book.genre.NotNull.message}")
     Genre genre,
 
-    @NotNull(message = "authorId must not be null")
+    @NotNull(message = "{book.authorId.NotNull.message}")
     UUID authorId
 ) {
 }
