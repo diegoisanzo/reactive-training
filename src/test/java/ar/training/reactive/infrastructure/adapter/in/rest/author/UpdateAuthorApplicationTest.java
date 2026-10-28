@@ -25,6 +25,7 @@ import java.util.UUID;
 import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorApplicationTestHelper.createAuthor;
 import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController.AUTHOR_PATH;
 import static java.time.temporal.ChronoUnit.MILLIS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -90,6 +91,20 @@ class UpdateAuthorApplicationTest extends BaseApplicationTest {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
         var longName = "a".repeat(Author.NAME_MAX_LENGTH + 1);
         assertBadRequestOnPut(AUTHOR_PATH, new AuthorDto(created.id(), longName), "name", "name must not exceed " + Author.NAME_MAX_LENGTH + " characters");
+    }
+
+    @Test
+    void shouldUpdateAuthorWithNameOfExactlyMaxLength() {
+        var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
+        var maxLengthName = "a".repeat(Author.NAME_MAX_LENGTH);
+        var updated = new AuthorDto(created.id(), maxLengthName);
+
+        authedPut(AUTHOR_PATH)
+                .bodyValue(updated)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(AuthorDto.class)
+                .value(res -> assertEquals(maxLengthName, res.name()));
     }
 
     @Test
