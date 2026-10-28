@@ -89,8 +89,32 @@ class AuthApplicationTest extends BaseApplicationTest {
     }
 
     @Test
+    void shouldReturn400WhenUsernameIsNull() {
+        var loginDto = new LoginDto(null, "password");
+        webTestClient.post()
+                .uri(LOGIN_PATH)
+                .bodyValue(loginDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class)
+                .value(pd -> assertBadRequestProblemDetail(pd, "username", "username must not be empty"));
+    }
+
+    @Test
     void shouldReturn400WhenPasswordIsBlank() {
         var loginDto = new LoginDto("admin-user", "");
+        webTestClient.post()
+                .uri(LOGIN_PATH)
+                .bodyValue(loginDto)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class)
+                .value(pd -> assertBadRequestProblemDetail(pd, "password", "password must not be empty"));
+    }
+
+    @Test
+    void shouldReturn400WhenPasswordIsNull() {
+        var loginDto = new LoginDto("admin-user", null);
         webTestClient.post()
                 .uri(LOGIN_PATH)
                 .bodyValue(loginDto)
