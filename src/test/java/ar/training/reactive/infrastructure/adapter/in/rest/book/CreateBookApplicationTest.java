@@ -124,6 +124,18 @@ class CreateBookApplicationTest extends BaseApplicationTest {
     }
 
     @Test
+    void shouldCreateBookWithTitleOfExactlyMaxLength() {
+        var maxLengthTitle = "a".repeat(Book.TITLE_MAX_LENGTH);
+        var createBookDto = new CreateBookDto("9780000000000", maxLengthTitle, 0, Genre.FICTION, AUTHOR_ID);
+        authedPost(BOOK_PATH)
+                .bodyValue(createBookDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BookDto.class)
+                .value(created -> assertEquals(maxLengthTitle, created.title()));
+    }
+
+    @Test
     void shouldReturn400WhenCreatingBookWithNegativeAvailableCopies() {
         var invalidDto = new CreateBookDto("9780000000000", "Valid Title", -1, Genre.FICTION, AUTHOR_ID);
         assertBadRequestOnPost(BOOK_PATH, invalidDto, "availableCopies", "availableCopies must be zero or positive");

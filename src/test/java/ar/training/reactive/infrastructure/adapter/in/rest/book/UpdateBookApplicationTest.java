@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_PATH;
 import static java.time.temporal.ChronoUnit.MILLIS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -102,6 +103,19 @@ class UpdateBookApplicationTest extends BaseApplicationTest {
         var longTitle = "a".repeat(Book.TITLE_MAX_LENGTH + 1);
         var invalidDto = new BookDto(UUID.randomUUID(), "9780000000000", longTitle, 0, Genre.FICTION, AUTHOR_ID);
         assertBadRequestOnPut(BOOK_PATH, invalidDto, "title", "title must not exceed " + Book.TITLE_MAX_LENGTH + " characters");
+    }
+
+    @Test
+    void shouldUpdateBookWithTitleOfExactlyMaxLength() {
+        var maxLengthTitle = "a".repeat(Book.TITLE_MAX_LENGTH);
+        var existing = BookDtoFixture.withDefaults();
+        var updated = new BookDto(existing.id(), existing.isbn(), maxLengthTitle, existing.availableCopies(), existing.genre(), existing.authorId());
+        authedPut(BOOK_PATH)
+                .bodyValue(updated)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BookDto.class)
+                .value(res -> assertEquals(maxLengthTitle, res.title()));
     }
 
     @Test
