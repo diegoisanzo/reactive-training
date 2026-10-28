@@ -20,6 +20,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorApplicationTestHelper.createAuthor;
@@ -91,6 +92,15 @@ class UpdateAuthorApplicationTest extends BaseApplicationTest {
         var created = createAuthor(authedReadWriteUserClient(), CreateAuthorDtoFixture.withDefaults());
         var longName = "a".repeat(Author.NAME_MAX_LENGTH + 1);
         assertBadRequestOnPut(AUTHOR_PATH, new AuthorDto(created.id(), longName), "name", "name must not exceed " + Author.NAME_MAX_LENGTH + " characters");
+    }
+
+    @Test
+    void shouldReturn400WhenUpdatingAuthorWithMultipleInvalidFields() {
+        var invalidAuthorDto = new AuthorDto(null, null);
+        assertBadRequestOnPut(AUTHOR_PATH, invalidAuthorDto, Map.of(
+                "id", "id must not be null",
+                "name", "name must not be blank"
+        ));
     }
 
     @Test

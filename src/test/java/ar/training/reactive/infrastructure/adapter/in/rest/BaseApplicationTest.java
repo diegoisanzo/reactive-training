@@ -81,33 +81,35 @@ public abstract class BaseApplicationTest {
         return authedAdminUserClient().delete().uri(path, uriVariables);
     }
 
-    protected void assertBadRequestOnPost(String path, Object invalidBody) {
-        assertBadRequest(authedPost(path).bodyValue(invalidBody));
+    protected void assertBadRequestOnPost(String path, Object invalidRequestBody) {
+        assertBadRequestOnPost(path, invalidRequestBody, Map.of());
     }
 
-    protected void assertBadRequestOnPost(String path, Object invalidBody, String expectedField, String expectedMessage) {
-        assertBadRequest(authedPost(path).bodyValue(invalidBody), path, expectedField, expectedMessage);
+    protected void assertBadRequestOnPost(String path, Object invalidRequestBody, String expectedField, String expectedMessage) {
+        assertBadRequestOnPost(path, invalidRequestBody, Map.of(expectedField, expectedMessage));
     }
 
-    protected void assertBadRequestOnPut(String path, Object invalidBody) {
-        assertBadRequest(authedPut(path).bodyValue(invalidBody));
+    protected void assertBadRequestOnPost(String path, Object invalidRequestBody, Map<String, String> expectedFieldErrors) {
+        assertBadRequest(authedPost(path).bodyValue(invalidRequestBody), path, expectedFieldErrors);
     }
 
-    protected void assertBadRequestOnPut(String path, Object invalidBody, String expectedField, String expectedMessage) {
-        assertBadRequest(authedPut(path).bodyValue(invalidBody), path, expectedField, expectedMessage);
+    protected void assertBadRequestOnPut(String path, Object invalidRequestBody) {
+        assertBadRequestOnPut(path, invalidRequestBody, Map.of());
     }
 
-    private void assertBadRequest(WebTestClient.RequestHeadersSpec<?> request) {
-        request.exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ProblemDetail.class)
-                .value(problemDetail -> {
-                    assertNotNull(problemDetail);
-                    assertEquals(400, problemDetail.getStatus());
-                });
+    protected void assertBadRequestOnPut(String path, Object invalidRequestBody, String expectedField, String expectedMessage) {
+        assertBadRequestOnPut(path, invalidRequestBody, Map.of(expectedField, expectedMessage));
+    }
+
+    protected void assertBadRequestOnPut(String path, Object invalidRequestBody, Map<String, String> expectedFieldErrors) {
+        assertBadRequest(authedPut(path).bodyValue(invalidRequestBody), path, expectedFieldErrors);
     }
 
     protected void assertBadRequest(WebTestClient.RequestHeadersSpec<?> request, String path, String expectedField, String expectedMessage) {
+        assertBadRequest(request, path, Map.of(expectedField, expectedMessage));
+    }
+
+    protected void assertBadRequest(WebTestClient.RequestHeadersSpec<?> request, String path, Map<String, String> expectedFieldErrors) {
         request.exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ProblemDetail.class)
@@ -124,15 +126,21 @@ public abstract class BaseApplicationTest {
                     var fieldErrors = (List<Map<String, Object>>) properties.get("fieldErrors");
                     assertNotNull(fieldErrors, "fieldErrors should not be null");
 
-                    boolean match = fieldErrors.stream().anyMatch(error ->
-                            expectedField.equals(error.get("field")) &&
-                            expectedMessage.equals(error.get("message"))
-                    );
-                    assertTrue(match, () -> String.format(
-                            "Expected fieldError with field='%s' and message='%s', but got: %s",
-                            expectedField, expectedMessage, fieldErrors
-                    ));
+                    expectedFieldErrors.forEach((field, message) -> {
+                        boolean match = fieldErrors.stream().anyMatch(error ->
+                                field.equals(error.get("field")) &&
+                                message.equals(error.get("message"))
+                        );
+                        assertTrue(match, () -> String.format(
+                                "Expected fieldError with field='%s' and message='%s', but got: %s",
+                                field, message, fieldErrors
+                        ));
+                    });
                 });
+    }
+
+    protected static void assertUnauthorized(ProblemDetail problemDetail, String path) {
+        assertProblemDetail(problemDetail, 401, "Unauthorized", path);
     }
 
     protected static void assertInternalServerError(ProblemDetail problemDetail, String path) {

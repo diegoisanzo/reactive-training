@@ -21,6 +21,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 
 import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_BY_ID_PATH;
@@ -151,6 +152,18 @@ class CreateBookApplicationTest extends BaseApplicationTest {
     void shouldReturn400WhenCreatingBookWithNullAuthorId() {
         var invalidDto = new CreateBookDto("9780000000000", "Valid Title", 0, Genre.FICTION, null);
         assertBadRequestOnPost(BOOK_PATH, invalidDto, "authorId", "authorId must not be null");
+    }
+
+    @Test
+    void shouldReturn400WhenCreatingBookWithMultipleInvalidFields() {
+        var invalidCreateBookDto = new CreateBookDto(null, null, -1, null, null);
+        assertBadRequestOnPost(BOOK_PATH, invalidCreateBookDto, Map.of(
+                "isbn", "isbn must not be null",
+                "title", "title must not be null",
+                "availableCopies", "availableCopies must be zero or positive",
+                "genre", "genre must not be null",
+                "authorId", "authorId must not be null"
+        ));
     }
 
     @Test

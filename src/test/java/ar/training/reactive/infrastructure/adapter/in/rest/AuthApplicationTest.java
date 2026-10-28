@@ -57,11 +57,7 @@ class AuthApplicationTest extends BaseApplicationTest {
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ProblemDetail.class)
-                .value(AuthApplicationTest::assertUnauthorizedProblemDetail);
-    }
-
-    private static void assertUnauthorizedProblemDetail(ProblemDetail pd) {
-        assertProblemDetail(pd, 401, "Unauthorized", LOGIN_PATH);
+                .value(pd -> assertUnauthorized(pd, LOGIN_PATH));
     }
 
     @Test
@@ -73,75 +69,48 @@ class AuthApplicationTest extends BaseApplicationTest {
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ProblemDetail.class)
-                .value(AuthApplicationTest::assertUnauthorizedProblemDetail);
+                .value(pd -> assertUnauthorized(pd, LOGIN_PATH));
     }
 
     @Test
     void shouldReturn400WhenUsernameIsBlank() {
         var loginDto = new LoginDto("", "password");
-        webTestClient.post()
-                .uri(LOGIN_PATH)
-                .bodyValue(loginDto)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ProblemDetail.class)
-                .value(pd -> assertBadRequestProblemDetail(pd, "username", "username must not be empty"));
+        assertBadRequest(webTestClient.post().uri(LOGIN_PATH).bodyValue(loginDto), LOGIN_PATH, "username", "username must not be empty");
     }
 
     @Test
     void shouldReturn400WhenUsernameIsNull() {
         var loginDto = new LoginDto(null, "password");
-        webTestClient.post()
-                .uri(LOGIN_PATH)
-                .bodyValue(loginDto)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ProblemDetail.class)
-                .value(pd -> assertBadRequestProblemDetail(pd, "username", "username must not be empty"));
+        assertBadRequest(webTestClient.post().uri(LOGIN_PATH).bodyValue(loginDto), LOGIN_PATH, "username", "username must not be empty");
     }
 
     @Test
     void shouldReturn400WhenPasswordIsBlank() {
         var loginDto = new LoginDto("admin-user", "");
-        webTestClient.post()
-                .uri(LOGIN_PATH)
-                .bodyValue(loginDto)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ProblemDetail.class)
-                .value(pd -> assertBadRequestProblemDetail(pd, "password", "password must not be empty"));
+        assertBadRequest(webTestClient.post().uri(LOGIN_PATH).bodyValue(loginDto), LOGIN_PATH, "password", "password must not be empty");
     }
 
     @Test
     void shouldReturn400WhenPasswordIsNull() {
         var loginDto = new LoginDto("admin-user", null);
-        webTestClient.post()
-                .uri(LOGIN_PATH)
-                .bodyValue(loginDto)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody(ProblemDetail.class)
-                .value(pd -> assertBadRequestProblemDetail(pd, "password", "password must not be empty"));
+        assertBadRequest(webTestClient.post().uri(LOGIN_PATH).bodyValue(loginDto), LOGIN_PATH, "password", "password must not be empty");
     }
 
-    private static void assertBadRequestProblemDetail(ProblemDetail pd, String expectedField, String expectedMessage) {
-        assertNotNull(pd);
-        assertEquals(400, pd.getStatus());
-        assertEquals("Validation Failed", pd.getTitle());
-        assertEquals("Input validation failed", pd.getDetail());
-        var properties = pd.getProperties();
-        assertNotNull(properties, "ProblemDetail properties should not be null");
-        @SuppressWarnings("unchecked")
-        var fieldErrors = (List<Map<String, Object>>) properties.get("fieldErrors");
-        assertNotNull(fieldErrors, "fieldErrors should not be null");
+    @Test
+    void shouldReturn400WhenBothUsernameAndPasswordAreEmpty() {
+        var loginDto = new LoginDto("", "");
+        assertBadRequest(webTestClient.post().uri(LOGIN_PATH).bodyValue(loginDto), LOGIN_PATH, Map.of(
+                "username", "username must not be empty",
+                "password", "password must not be empty"
+        ));
+    }
 
-        boolean match = fieldErrors.stream().anyMatch(error ->
-                expectedField.equals(error.get("field")) &&
-                expectedMessage.equals(error.get("message"))
-        );
-        assertTrue(match, () -> String.format(
-                "Expected fieldError with field='%s' and message='%s', but got: %s",
-                expectedField, expectedMessage, fieldErrors
+    @Test
+    void shouldReturn400WhenBothUsernameAndPasswordAreNull() {
+        var loginDto = new LoginDto(null, null);
+        assertBadRequest(webTestClient.post().uri(LOGIN_PATH).bodyValue(loginDto), LOGIN_PATH, Map.of(
+                "username", "username must not be empty",
+                "password", "password must not be empty"
         ));
     }
 
