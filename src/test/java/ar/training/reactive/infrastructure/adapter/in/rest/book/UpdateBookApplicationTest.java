@@ -7,6 +7,7 @@ import ar.training.reactive.domain.model.Genre;
 import ar.training.reactive.fixture.book.BookDtoFixture;
 import ar.training.reactive.infrastructure.adapter.in.rest.BaseApplicationTest;
 import ar.training.reactive.infrastructure.adapter.in.rest.TestDataSetup;
+import ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorDto;
 import ar.training.reactive.infrastructure.adapter.out.persistence.author.AuthorDBData;
 import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
+import static ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController.AUTHOR_PATH;
 import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_BY_ID_PATH;
 import static ar.training.reactive.infrastructure.adapter.in.rest.book.BookController.BOOK_PATH;
 import static java.time.temporal.ChronoUnit.MILLIS;
@@ -89,6 +91,11 @@ class UpdateBookApplicationTest extends BaseApplicationTest {
         var current = BookDtoFixture.withDefaults();
         var nonExistentAuthorId = UUID.randomUUID();
         assertTrue(AuthorDBData.ALL.stream().noneMatch(author -> author.getId().equals(nonExistentAuthorId)));
+        authedGet(AUTHOR_PATH)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(AuthorDto.class)
+                .value(authors -> assertTrue(authors.stream().noneMatch(author -> author.id().equals(nonExistentAuthorId))));
         var updated = new BookDto(
                 current.id(),
                 current.isbn(),
