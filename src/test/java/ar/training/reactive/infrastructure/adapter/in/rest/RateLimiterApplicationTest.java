@@ -115,7 +115,7 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn429ForCreateBookWhenRateLimitExceeded() {
         var request = authedPost(BOOK_PATH).bodyValue(CreateBookDtoFixture.withDefaults());
-        request.exchange().expectStatus().isOk();
+        request.exchange().expectStatus().isCreated();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 
@@ -152,7 +152,7 @@ class RateLimiterApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn429ForCreateAuthorWhenRateLimitExceeded() {
         var request = authedPost(AUTHOR_PATH).bodyValue(CreateAuthorDtoFixture.withDefaults());
-        request.exchange().expectStatus().isOk();
+        request.exchange().expectStatus().isCreated();
         assertIsStatus429AndRateLimitExceeded(request.exchange());
     }
 

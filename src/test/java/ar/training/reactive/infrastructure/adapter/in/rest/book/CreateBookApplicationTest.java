@@ -54,7 +54,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
         authedPost(BOOK_PATH)
                 .bodyValue(createBookDto)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(BookDto.class)
                 .value(newBookDto -> {
                     assertNotNull(newBookDto);
@@ -73,7 +73,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
         var created = authedPost(BOOK_PATH)
                 .bodyValue(createBookDto)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(BookDto.class)
                 .returnResult()
                 .getResponseBody();
@@ -131,9 +131,12 @@ class CreateBookApplicationTest extends BaseApplicationTest {
         authedPost(BOOK_PATH)
                 .bodyValue(createBookDto)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(BookDto.class)
-                .value(created -> assertEquals(maxLengthTitle, created.title()));
+                .value(created -> {
+                    assertNotNull(created);
+                    assertEquals(maxLengthTitle, created.title());
+                });
     }
 
     @Test
@@ -186,7 +189,7 @@ class CreateBookApplicationTest extends BaseApplicationTest {
     @Test
     void shouldReturn409WhenBookAlreadyExists() {
         var existingBookId = java.util.UUID.randomUUID();
-        doAnswer(invocation -> Mono.error(new BookAlreadyExistsException(existingBookId)))
+        doAnswer(_ -> Mono.error(new BookAlreadyExistsException(existingBookId)))
                 .when(createBookInboundPort)
                 .createBook(any(Book.class));
 

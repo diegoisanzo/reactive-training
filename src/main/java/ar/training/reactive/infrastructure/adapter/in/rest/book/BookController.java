@@ -23,6 +23,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RestController
 public class BookController {
 
@@ -62,7 +64,7 @@ public class BookController {
         logger.info("BookController::createBook()");
         return createBookInboundPort.createBook(restBookMapper.toBook(createBookDto))
                 .map(restBookDtoMapper::toBookDto)
-                .map(ResponseEntity::ok);
+                .map(dto -> ResponseEntity.status(CREATED).body(dto));
     }
 
     @GetMapping(BOOK_PATH)

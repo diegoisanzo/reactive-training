@@ -16,7 +16,7 @@ public class CreateAuthorUseCase implements CreateAuthorInboundPort {
 
     public Mono<Author> createAuthor(Author author) {
         return authorRepository.findById(author.getId())
-                .flatMap(transformer -> Mono.error(new AuthorAlreadyExistsException(author.getId())))
+                .flatMap(_ -> Mono.error(new AuthorAlreadyExistsException(author.getId())))
                 .then(authorRepository.save(author));
     }
 }

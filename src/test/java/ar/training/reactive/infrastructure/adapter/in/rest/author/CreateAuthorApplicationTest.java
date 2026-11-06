@@ -48,7 +48,7 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
         authedPost(AUTHOR_PATH)
                 .bodyValue(createAuthorDto)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(AuthorDto.class)
                 .value(newAuthorDto -> {
                     assertNotNull(newAuthorDto);
@@ -63,10 +63,13 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
         var created = authedPost(AUTHOR_PATH)
                 .bodyValue(createAuthorDto)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(AuthorDto.class)
                 .returnResult()
                 .getResponseBody();
+
+        assertNotNull(created);
+        assertNotNull(created.id());
 
         authedGet(AUTHOR_BY_ID_PATH, created.id())
                 .exchange()
@@ -102,9 +105,12 @@ class CreateAuthorApplicationTest extends BaseApplicationTest {
         authedPost(AUTHOR_PATH)
                 .bodyValue(new CreateAuthorDto(maxLengthName))
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(AuthorDto.class)
-                .value(created -> assertEquals(maxLengthName, created.name()));
+                .value(created -> {
+                    assertNotNull(created);
+                    assertEquals(maxLengthName, created.name());
+                });
     }
 
     @Test

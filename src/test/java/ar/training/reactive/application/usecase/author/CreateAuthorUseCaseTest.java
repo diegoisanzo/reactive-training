@@ -26,7 +26,7 @@ class CreateAuthorUseCaseTest {
     private CreateAuthorUseCase createAuthorUseCase;
 
     @Test
-    void shouldCreateBookWhenItDoesNotExist() {
+    void shouldCreateAuthorWhenItDoesNotExist() {
         var author = AuthorFixture.withDefaults();
         when(authorRepositoryOutboundPort.findById(author.getId())).thenReturn(Mono.empty());
         when(authorRepositoryOutboundPort.save(any(Author.class))).thenReturn(Mono.just(author));
@@ -40,7 +40,7 @@ class CreateAuthorUseCaseTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenBookAlreadyExists() {
+    void shouldThrowExceptionWhenAuthorAlreadyExists() {
         var author = AuthorFixture.withDefaults();
         when(authorRepositoryOutboundPort.findById(author.getId())).thenReturn(Mono.just(author));
         // Mocking save because .then() evaluates its argument during assembly

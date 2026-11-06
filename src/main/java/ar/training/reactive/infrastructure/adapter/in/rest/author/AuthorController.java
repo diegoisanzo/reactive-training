@@ -23,6 +23,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RestController
 public class AuthorController {
 
@@ -62,7 +64,7 @@ public class AuthorController {
         logger.info("AuthorController::createAuthor()");
         return createAuthorInboundPort.createAuthor(restAuthorMapper.toAuthor(createAuthorDto))
                 .map(restAuthorDtoMapper::toAuthorDto)
-                .map(ResponseEntity::ok);
+                .map(dto -> ResponseEntity.status(CREATED).body(dto));
     }
 
     @GetMapping(AUTHOR_PATH)

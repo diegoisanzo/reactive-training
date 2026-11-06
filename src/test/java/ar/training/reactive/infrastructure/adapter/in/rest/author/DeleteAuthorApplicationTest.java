@@ -65,7 +65,7 @@ class DeleteAuthorApplicationTest extends BaseApplicationTest {
         authedPost(BookController.BOOK_PATH)
                 .bodyValue(new CreateBookDto("1780132350999", "Some Book", 1, Genre.FICTION, author.id()))
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isCreated();
 
         authedAdminDelete(AUTHOR_BY_ID_PATH, author.id()).exchange()
                 .expectStatus().isEqualTo(409)

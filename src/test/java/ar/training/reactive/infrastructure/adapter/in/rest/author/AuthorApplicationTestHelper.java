@@ -13,7 +13,7 @@ final class AuthorApplicationTestHelper {
                 .uri(AUTHOR_PATH)
                 .bodyValue(dto)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody(AuthorDto.class)
                 .returnResult()
                 .getResponseBody();
