@@ -34,7 +34,9 @@ public class BookUseCaseConfig {
     }
 
     @Bean
-    public UpdateBookUseCase updateBookUseCase(BookRepositoryOutboundPort bookRepositoryPort) {
-        return new UpdateBookUseCase(bookRepositoryPort);
+    public UpdateBookUseCase updateBookUseCase(
+            BookRepositoryOutboundPort bookRepositoryPort,
+            AuthorRepositoryOutboundPort authorRepositoryPort) {
+        return new UpdateBookUseCase(bookRepositoryPort, authorRepositoryPort);
     }
 }

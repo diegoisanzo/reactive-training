@@ -41,6 +41,10 @@ public final class Book {
             setGenre(other.getGenre());
             dirty = true;
         }
+        if (!Objects.equals(getAuthorId(), other.getAuthorId())) {
+            setAuthorId(other.getAuthorId());
+            dirty = true;
+        }
         return dirty;
     }
 
