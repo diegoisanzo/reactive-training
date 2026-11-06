@@ -36,6 +36,6 @@ class JwtAuthenticationWebFilterApplicationTest extends BaseApplicationTest {
         authedGet(BOOK_PATH)
                 .exchange()
                 .expectStatus().isOk();
-        verify(jwtServiceSpy, times(2)).getAuthenticationFrom(any()); // TODO: to be fixed, must be 1 instead of 2
+        verify(jwtServiceSpy, times(1)).getAuthenticationFrom(any());
     }
 }

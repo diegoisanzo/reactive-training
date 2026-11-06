@@ -5,6 +5,7 @@ import ar.training.reactive.infrastructure.adapter.in.grpc.book.BookGrpcService;
 import ar.training.reactive.infrastructure.adapter.in.rest.auth.AuthController;
 import ar.training.reactive.infrastructure.adapter.in.rest.author.AuthorController;
 import ar.training.reactive.infrastructure.adapter.in.rest.book.BookController;
+import ar.training.reactive.infrastructure.security.jwt.JwtService;
 import ar.training.reactive.infrastructure.security.jwt.grpc.JwtGrpcAuthenticationExtractor;
 import ar.training.reactive.infrastructure.security.jwt.grpc.JwtGrpcAuthenticationProvider;
 import ar.training.reactive.infrastructure.security.jwt.rest.JwtAuthenticationWebFilter;
@@ -34,7 +35,7 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(
             ServerHttpSecurity http,
-            JwtAuthenticationWebFilter jwtFilter) {
+            JwtService jwtService) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
@@ -52,7 +53,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.DELETE, AuthorController.AUTHOR_PATH + "/**").hasRole(Role.ADMIN.name())
                         .anyExchange().authenticated()
                 )
-                .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterAt(new JwtAuthenticationWebFilter(jwtService), SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
 
